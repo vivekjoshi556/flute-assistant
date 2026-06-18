@@ -45,7 +45,8 @@ function AppRoutes() {
         path="/practice/guided"
         element={
           <OnboardingGuard>
-            <GuidedPracticeScreen mode="guided" />
+            {/* build failed so remove mode="guided" */}
+            <GuidedPracticeScreen />
           </OnboardingGuard>
         }
       />

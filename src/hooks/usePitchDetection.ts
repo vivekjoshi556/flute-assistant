@@ -111,7 +111,7 @@ export function usePitchDetection(fluteKey: FluteKey, enabled: boolean) {
       }
 
       const stability = computeStability(historyRef.current)
-      const displayFreq = getDisplayFrequency()
+      // const displayFreq = getDisplayFrequency()
 
       if (!isPlaying) {
         setReading({
