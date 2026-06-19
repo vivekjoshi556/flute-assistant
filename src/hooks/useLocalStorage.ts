@@ -6,6 +6,8 @@ const STATS_KEY = 'bansuri-stats'
 
 const DEFAULT_SETTINGS: AppSettings = {
   fluteKey: 'C',
+  bansuriType: 'middle',
+  baseOctave: 5,
   onboardingComplete: false,
 }
 
@@ -26,6 +28,18 @@ function loadJSON<T>(key: string, fallback: T): T {
   }
 }
 
+/** Ensure saved settings have newer fields (baseOctave, bansuriType). */
+function migrateSettings(settings: AppSettings): AppSettings {
+  const migrated = { ...settings }
+  if (!migrated.baseOctave) {
+    migrated.baseOctave = DEFAULT_SETTINGS.baseOctave
+  }
+  if (!migrated.bansuriType) {
+    migrated.bansuriType = DEFAULT_SETTINGS.bansuriType
+  }
+  return migrated
+}
+
 function todayString(): string {
   return new Date().toISOString().slice(0, 10)
 }
@@ -38,7 +52,7 @@ function yesterdayString(): string {
 
 export function useLocalStorage() {
   const [settings, setSettings] = useState<AppSettings>(() =>
-    loadJSON(SETTINGS_KEY, DEFAULT_SETTINGS),
+    migrateSettings(loadJSON(SETTINGS_KEY, DEFAULT_SETTINGS)),
   )
   const [stats, setStats] = useState<UserStats>(() =>
     loadJSON(STATS_KEY, DEFAULT_STATS),

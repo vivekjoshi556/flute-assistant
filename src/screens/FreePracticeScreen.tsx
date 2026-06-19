@@ -107,7 +107,7 @@ export function FreePracticeScreen() {
           liveActualLabel={reading.note}
         />
 
-        <RegisterIndicator detectedOctave={reading.octave} />
+        <RegisterIndicator detectedOctave={reading.octave} baseOctave={settings.baseOctave} />
 
         <div className="text-center space-y-2 min-h-[72px]">
           <p className="text-sm text-text-muted">Pitch Stability</p>

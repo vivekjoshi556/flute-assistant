@@ -3,6 +3,7 @@ import { getRegisterFeedback, registerShortLabel, octaveToRegister } from '../mu
 interface RegisterIndicatorProps {
   detectedOctave: number
   expectedOctave?: number
+  baseOctave?: number
   detectedFrequency?: number
   expectedFrequency?: number
 }
@@ -10,16 +11,17 @@ interface RegisterIndicatorProps {
 export function RegisterIndicator({
   detectedOctave,
   expectedOctave,
+  baseOctave = 5,
 }: RegisterIndicatorProps) {
   const feedback =
     expectedOctave && expectedOctave > 0
-      ? getRegisterFeedback(detectedOctave, expectedOctave)
+      ? getRegisterFeedback(detectedOctave, expectedOctave, baseOctave)
       : detectedOctave > 0
         ? {
-            register: octaveToRegister(detectedOctave),
+            register: octaveToRegister(detectedOctave, baseOctave),
             status: 'unknown' as const,
-            message: `Playing in ${registerShortLabel(octaveToRegister(detectedOctave))} register`,
-            hint: 'Middle register (octave 4) is where most beginner practice happens.',
+            message: `Playing in ${registerShortLabel(octaveToRegister(detectedOctave, baseOctave))} register`,
+            hint: `Middle register (your flute's normal range) is where most beginner practice happens.`,
           }
         : {
             register: 'middle' as const,
@@ -39,10 +41,10 @@ export function RegisterIndicator({
 
   const registers = ['lower', 'middle', 'higher'] as const
   const activeRegister =
-    detectedOctave > 0 ? octaveToRegister(detectedOctave) : null
+    detectedOctave > 0 ? octaveToRegister(detectedOctave, baseOctave) : null
   const targetRegister =
     expectedOctave && expectedOctave > 0
-      ? octaveToRegister(expectedOctave)
+      ? octaveToRegister(expectedOctave, baseOctave)
       : 'middle'
 
   return (

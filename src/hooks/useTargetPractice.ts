@@ -52,7 +52,7 @@ export function useTargetPractice({
     : null
 
   const targetLabel = target
-    ? `${target.note}${target.octave >= 5 && target.note === 'SA' ? '↑' : ''}`
+    ? `${target.note}${target.octave > targets[0]?.octave && target.note === 'SA' ? '↑' : ''}`
     : null
 
   const { points: chartPoints, clear: clearChart } = usePitchChart(

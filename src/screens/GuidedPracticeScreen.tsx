@@ -18,16 +18,19 @@ const EXERCISE_OPTIONS: { type: GuidedExerciseType; label: string; desc: string 
   { type: 'random', label: 'Random Notes', desc: 'Random sequence — builds recall' },
 ]
 
-const REGISTER_OPTIONS: { value: Register; label: string; octave: number }[] = [
-  { value: 'lower', label: 'Lower', octave: 3 },
-  { value: 'middle', label: 'Middle', octave: 4 },
-  { value: 'higher', label: 'Higher', octave: 5 },
-]
+function getRegisterOptions(baseOctave: number): { value: Register; label: string; octave: number }[] {
+  return [
+    { value: 'lower', label: 'Lower', octave: baseOctave - 1 },
+    { value: 'middle', label: 'Middle', octave: baseOctave },
+    { value: 'higher', label: 'Higher', octave: baseOctave + 1 },
+  ]
+}
 
 export function GuidedPracticeScreen() {
   const { settings, setActiveSession } = useApp()
   const navigate = useNavigate()
-  const [baseOctave, setBaseOctave] = useState(4)
+  const registerOptions = getRegisterOptions(settings.baseOctave)
+  const [baseOctave, setBaseOctave] = useState(settings.baseOctave)
   const [targets, setTargets] = useState<NoteTarget[]>([])
   const [started, setStarted] = useState(false)
   const pendingStart = useRef(false)
@@ -74,7 +77,7 @@ export function GuidedPracticeScreen() {
         </p>
 
         <div className="flex justify-center gap-2 mb-6">
-          {REGISTER_OPTIONS.map((opt) => (
+          {registerOptions.map((opt) => (
             <button
               key={opt.value}
               type="button"
@@ -145,6 +148,7 @@ export function GuidedPracticeScreen() {
         chartPoints={practice.chartPoints}
         feedback={practice.feedback}
         fluteKey={settings.fluteKey}
+        baseOctave={settings.baseOctave}
         showHints={practice.showHints}
         hintsAvailable
         statusLabel={statusLabel}

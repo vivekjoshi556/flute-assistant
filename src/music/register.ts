@@ -2,9 +2,9 @@ import type { IndianNote } from '../types'
 
 export type Register = 'lower' | 'middle' | 'higher'
 
-export function octaveToRegister(octave: number): Register {
-  if (octave <= 3) return 'lower'
-  if (octave >= 5) return 'higher'
+export function octaveToRegister(octave: number, baseOctave = 5): Register {
+  if (octave < baseOctave) return 'lower'
+  if (octave > baseOctave) return 'higher'
   return 'middle'
 }
 
@@ -34,6 +34,7 @@ export function registerShortLabel(register: Register): string {
 export function getRegisterFeedback(
   detectedOctave: number,
   expectedOctave: number,
+  baseOctave = 5,
 ): {
   register: Register
   status: 'correct' | 'too-low' | 'too-high' | 'unknown'
@@ -49,7 +50,7 @@ export function getRegisterFeedback(
     }
   }
 
-  const detected = octaveToRegister(detectedOctave)
+  const detected = octaveToRegister(detectedOctave, baseOctave)
   const diff = detectedOctave - expectedOctave
 
   if (diff === 0) {
@@ -83,6 +84,6 @@ export interface NoteTarget {
   octave: number
 }
 
-export function noteTargetLabel(target: NoteTarget): string {
-  return target.octave >= 5 && target.note === 'SA' ? 'SA↑' : target.note
+export function noteTargetLabel(target: NoteTarget, baseOctave = 5): string {
+  return target.octave > baseOctave && target.note === 'SA' ? 'SA↑' : target.note
 }

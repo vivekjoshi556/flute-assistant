@@ -28,6 +28,7 @@ interface PracticeLayoutProps {
   chartPoints: ChartPoint[]
   feedback: FeedbackState
   fluteKey: FluteKey
+  baseOctave?: number
   showHints?: boolean
   hintsAvailable?: boolean
   statusLabel?: string
@@ -43,6 +44,7 @@ export function PracticeLayout({
   chartPoints,
   feedback,
   fluteKey,
+  baseOctave = 5,
   showHints = false,
   hintsAvailable = true,
   statusLabel = 'Play',
@@ -125,6 +127,7 @@ export function PracticeLayout({
           <RegisterIndicator
             detectedOctave={reading.octave}
             expectedOctave={target?.octave}
+            baseOctave={baseOctave}
           />
           <NoteWheel detectedNote={detectedNote} targetNote={target?.note ?? null} />
           <DetectionPanel

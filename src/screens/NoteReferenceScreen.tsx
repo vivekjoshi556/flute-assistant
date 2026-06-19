@@ -6,17 +6,20 @@ import { getNoteFrequency, formatFrequency } from '../music/notes'
 import { INDIAN_NOTES, type IndianNote } from '../types'
 import type { Register } from '../music/register'
 
-const REGISTER_OPTIONS: { value: Register; label: string; octave: number }[] = [
-  { value: 'lower', label: 'Lower', octave: 3 },
-  { value: 'middle', label: 'Middle', octave: 4 },
-  { value: 'higher', label: 'Higher', octave: 5 },
-]
+function getRegisterOptions(baseOctave: number): { value: Register; label: string; octave: number }[] {
+  return [
+    { value: 'lower', label: 'Lower', octave: baseOctave - 1 },
+    { value: 'middle', label: 'Middle', octave: baseOctave },
+    { value: 'higher', label: 'Higher', octave: baseOctave + 1 },
+  ]
+}
 
 export function NoteReferenceScreen() {
   const { settings } = useApp()
+  const registerOptions = getRegisterOptions(settings.baseOctave)
   const [selected, setSelected] = useState<IndianNote>('SA')
-  const [baseOctave, setBaseOctave] = useState(4)
-  const [selectedOctave, setSelectedOctave] = useState(4)
+  const [baseOctave, setBaseOctave] = useState(settings.baseOctave)
+  const [selectedOctave, setSelectedOctave] = useState(settings.baseOctave)
   const { play } = useTonePlayer(settings.fluteKey)
 
   const frequency = getNoteFrequency(selected, settings.fluteKey, selectedOctave)
@@ -33,7 +36,7 @@ export function NoteReferenceScreen() {
       </p>
 
       <div className="flex justify-center gap-2 mb-6">
-        {REGISTER_OPTIONS.map((opt) => (
+        {registerOptions.map((opt) => (
           <button
             key={opt.value}
             type="button"
@@ -91,7 +94,7 @@ export function NoteReferenceScreen() {
             {selectedOctave === baseOctave + 1 && selected === 'SA' ? '↑' : ''}
           </p>
           <p className="text-xs text-text-muted mt-1">
-            {REGISTER_OPTIONS.find((r) => r.octave === (selectedOctave === baseOctave + 1 ? baseOctave : selectedOctave))?.label ?? 'Middle'} register
+            {registerOptions.find((r) => r.octave === (selectedOctave === baseOctave + 1 ? baseOctave : selectedOctave))?.label ?? 'Middle'} register
             {selectedOctave === baseOctave + 1 ? ' (upper)' : ''}
           </p>
         </div>

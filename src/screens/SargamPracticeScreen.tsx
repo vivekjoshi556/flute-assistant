@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { Layout } from '../components/Layout'
 import { PracticeLayout } from '../components/PracticeLayout'
 import { useTargetPractice } from '../hooks/useTargetPractice'
 import {
-  SARGAMS,
+  getSargamsForOctave,
   DIFFICULTY_LABELS,
   type Sargam,
   type SargamDifficulty,
@@ -19,6 +19,7 @@ export function SargamPracticeScreen() {
   const [selected, setSelected] = useState<Sargam | null>(null)
   const [started, setStarted] = useState(false)
   const pendingStart = useRef(false)
+  const sargams = useMemo(() => getSargamsForOctave(settings.baseOctave), [settings.baseOctave])
 
   const practice = useTargetPractice({
     fluteKey: settings.fluteKey,
@@ -74,7 +75,7 @@ export function SargamPracticeScreen() {
         </p>
         <div className="space-y-6">
           {DIFFICULTY_ORDER.map((difficulty) => {
-            const items = SARGAMS.filter((s) => s.difficulty === difficulty)
+            const items = sargams.filter((s) => s.difficulty === difficulty)
             if (items.length === 0) return null
             return (
               <div key={difficulty}>
@@ -102,7 +103,7 @@ export function SargamPracticeScreen() {
                         <p className="text-sm text-text-muted mt-1">{sargam.description}</p>
                         <p className="text-xs text-accent/80 mt-2 tracking-wide">
                           {sargam.notes.map((n) =>
-                            n.octave >= 5 && n.note === 'SA' ? 'SA↑' : n.note,
+                            n.octave > settings.baseOctave && n.note === 'SA' ? 'SA↑' : n.note,
                           ).join(' ')}
                         </p>
                       </button>
@@ -146,6 +147,7 @@ export function SargamPracticeScreen() {
         chartPoints={practice.chartPoints}
         feedback={practice.feedback}
         fluteKey={settings.fluteKey}
+        baseOctave={settings.baseOctave}
         showHints={practice.showHints}
         hintsAvailable
         statusLabel={practice.phase === 'hold' ? 'Hold steady' : 'Play'}

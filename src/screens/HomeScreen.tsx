@@ -3,16 +3,18 @@ import { useApp } from '../context/AppContext'
 import { Card, StatCard } from '../components/Layout'
 import { formatDuration } from '../hooks/useLocalStorage'
 import { EducationalPanel } from '../components/EducationalPanel'
+import { BANSURI_TYPES } from '../types'
 
 export function HomeScreen() {
   const { settings, stats } = useApp()
+  const bansuriLabel = BANSURI_TYPES.find((b) => b.type === settings.bansuriType)?.label ?? 'Middle Octave'
 
   return (
     <div className="min-h-dvh max-w-3xl mx-auto px-4 py-8">
       <header className="text-center mb-8">
         <h1 className="text-3xl font-bold text-text">Bansuri Practice</h1>
         <p className="text-text-muted text-sm mt-1">
-          Flute key: <span className="text-accent">{settings.fluteKey}</span>
+          Flute: <span className="text-accent">{settings.fluteKey} · {bansuriLabel}</span>
           {' · '}
           <Link to="/onboarding" className="underline hover:text-text">
             Change

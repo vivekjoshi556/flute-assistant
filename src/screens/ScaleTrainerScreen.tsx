@@ -13,17 +13,20 @@ import type { Register } from '../music/register'
 
 type ScaleDirection = 'ascending' | 'descending'
 
-const REGISTER_OPTIONS: { value: Register; label: string; octave: number }[] = [
-  { value: 'lower', label: 'Lower', octave: 3 },
-  { value: 'middle', label: 'Middle', octave: 4 },
-  { value: 'higher', label: 'Higher', octave: 5 },
-]
+function getRegisterOptions(baseOctave: number): { value: Register; label: string; octave: number }[] {
+  return [
+    { value: 'lower', label: 'Lower', octave: baseOctave - 1 },
+    { value: 'middle', label: 'Middle', octave: baseOctave },
+    { value: 'higher', label: 'Higher', octave: baseOctave + 1 },
+  ]
+}
 
 export function ScaleTrainerScreen() {
   const { settings, setActiveSession } = useApp()
   const navigate = useNavigate()
+  const registerOptions = getRegisterOptions(settings.baseOctave)
   const [direction, setDirection] = useState<ScaleDirection | null>(null)
-  const [baseOctave, setBaseOctave] = useState(4)
+  const [baseOctave, setBaseOctave] = useState(settings.baseOctave)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [micOn, setMicOn] = useState(false)
   const [targets, setTargets] = useState<NoteTarget[]>([])
@@ -43,7 +46,7 @@ export function ScaleTrainerScreen() {
     micOn && currentIndex < targets.length,
     reading.note,
     target
-      ? `${target.note}${target.octave >= 5 && target.note === 'SA' ? '↑' : ''}`
+      ? `${target.note}${target.octave > baseOctave && target.note === 'SA' ? '↑' : ''}`
       : null,
   )
 
@@ -63,9 +66,10 @@ export function ScaleTrainerScreen() {
       reading.octave > 0 &&
       reading.octave !== target.octave
     ) {
+      const registerLabel = reading.octave > target.octave ? 'lower' : 'higher'
       return {
         type: 'register',
-        message: `Expected ${target.octave >= 5 ? 'higher' : target.octave <= 3 ? 'lower' : 'middle'} register`,
+        message: `Right note, but blow ${registerLabel} to match the target register`,
       }
     }
     return { type: 'idle' }
@@ -158,7 +162,7 @@ export function ScaleTrainerScreen() {
         </div>
 
         <div className="flex justify-center gap-2 mb-6">
-          {REGISTER_OPTIONS.map((opt) => (
+          {registerOptions.map((opt) => (
             <button
               key={opt.value}
               type="button"
@@ -226,6 +230,7 @@ export function ScaleTrainerScreen() {
         chartPoints={chartPoints}
         feedback={feedback}
         fluteKey={settings.fluteKey}
+        baseOctave={settings.baseOctave}
         showHints={feedback.type === 'wrong' || feedback.type === 'register'}
         hintsAvailable
         statusLabel={`Play — ${direction}`}

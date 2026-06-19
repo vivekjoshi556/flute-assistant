@@ -58,7 +58,17 @@ export type GuidedExerciseType =
   | 'descending'
   | 'random'
 
+export type BansuriType = 'middle' | 'bass' | 'small'
+
+export const BANSURI_TYPES: { type: BansuriType; label: string; description: string; baseOctave: number }[] = [
+  { type: 'middle', label: 'Middle Octave (19")', description: 'Most common beginner bansuri — 19–20 inches', baseOctave: 5 },
+  { type: 'bass', label: 'Bass Octave (25"+)', description: 'Longer flute — deep, low register', baseOctave: 4 },
+  { type: 'small', label: 'Small / High (13–15")', description: 'Short flute — bright, high register', baseOctave: 6 },
+]
+
 export interface AppSettings {
   fluteKey: FluteKey
+  bansuriType: BansuriType
+  baseOctave: number
   onboardingComplete: boolean
 }
