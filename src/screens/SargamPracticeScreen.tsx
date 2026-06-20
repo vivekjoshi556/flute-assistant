@@ -6,6 +6,9 @@ import { PracticeLayout } from '../components/PracticeLayout'
 import { useTargetPractice } from '../hooks/useTargetPractice'
 import {
   getSargamsForOctave,
+  getAscendingLoop,
+  getDescendingLoop,
+  getRandomAlankar,
   DIFFICULTY_LABELS,
   type Sargam,
   type SargamDifficulty,
@@ -21,10 +24,13 @@ export function SargamPracticeScreen() {
   const pendingStart = useRef(false)
   const sargams = useMemo(() => getSargamsForOctave(settings.baseOctave), [settings.baseOctave])
 
+  const isInfinite = selected?.id.startsWith('infinite-') ?? false
+
   const practice = useTargetPractice({
     fluteKey: settings.fluteKey,
     targets: selected?.notes ?? [],
     enabled: started && !!selected,
+    loop: isInfinite,
   })
 
   useEffect(() => {
@@ -38,6 +44,33 @@ export function SargamPracticeScreen() {
     setSelected(sargam)
     setStarted(true)
     pendingStart.current = true
+  }
+
+  const startInfinite = (type: 'ascending' | 'descending' | 'alankar') => {
+    let notes = []
+    let name = ''
+    let description = ''
+    if (type === 'ascending') {
+      notes = getAscendingLoop(settings.baseOctave)
+      name = 'Infinite Ascending'
+      description = 'Loops ascending scale continuously.'
+    } else if (type === 'descending') {
+      notes = getDescendingLoop(settings.baseOctave)
+      name = 'Infinite Descending'
+      description = 'Loops descending scale continuously.'
+    } else {
+      notes = getRandomAlankar(settings.baseOctave)
+      name = 'Infinite Random Alankar'
+      description = 'Loops a random alankar pattern continuously.'
+    }
+    
+    startSargam({
+      id: `infinite-${type}`,
+      name,
+      description,
+      difficulty: 'advanced',
+      notes,
+    })
   }
 
   const goBackToList = () => {
@@ -113,6 +146,44 @@ export function SargamPracticeScreen() {
               </div>
             )
           })}
+          
+          <div>
+            <h2 className="text-sm font-medium text-text-muted uppercase tracking-wider mb-3">
+              Infinite Practice
+            </h2>
+            <div className="grid gap-2">
+              <button
+                type="button"
+                onClick={() => startInfinite('ascending')}
+                className="py-4 px-5 rounded-xl bg-surface-raised border border-border hover:border-accent transition-all text-left"
+              >
+                <div className="flex justify-between items-start gap-2">
+                  <span className="font-medium text-text">Infinite Ascending</span>
+                </div>
+                <p className="text-sm text-text-muted mt-1">Loops ascending scale continuously.</p>
+              </button>
+              <button
+                type="button"
+                onClick={() => startInfinite('descending')}
+                className="py-4 px-5 rounded-xl bg-surface-raised border border-border hover:border-accent transition-all text-left"
+              >
+                <div className="flex justify-between items-start gap-2">
+                  <span className="font-medium text-text">Infinite Descending</span>
+                </div>
+                <p className="text-sm text-text-muted mt-1">Loops descending scale continuously.</p>
+              </button>
+              <button
+                type="button"
+                onClick={() => startInfinite('alankar')}
+                className="py-4 px-5 rounded-xl bg-surface-raised border border-border hover:border-accent transition-all text-left"
+              >
+                <div className="flex justify-between items-start gap-2">
+                  <span className="font-medium text-text">Infinite Random Alankar</span>
+                </div>
+                <p className="text-sm text-text-muted mt-1">Loops a random alankar pattern continuously.</p>
+              </button>
+            </div>
+          </div>
         </div>
       </Layout>
     )
@@ -150,7 +221,7 @@ export function SargamPracticeScreen() {
         baseOctave={settings.baseOctave}
         showHints={practice.showHints}
         hintsAvailable
-        statusLabel={practice.phase === 'hold' ? 'Hold steady' : 'Play'}
+        statusLabel={isInfinite ? `Loop ${practice.loopCount + 1}` : 'Play'}
         footer={
           <div className="flex justify-center pt-2">
             <button

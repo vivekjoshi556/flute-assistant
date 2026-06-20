@@ -174,9 +174,8 @@ function FeedbackBanner({ feedback }: { feedback: FeedbackState }) {
       )
     case 'hold':
       return (
-        <div className="text-center px-4 py-4 rounded-xl bg-accent/10 border border-accent/30 w-full max-w-md">
-          <p className="text-text-muted text-sm">Hold for</p>
-          <p className="text-5xl font-bold text-accent tabular-nums">{feedback.count}</p>
+        <div className="text-center text-accent text-xl font-bold px-4 py-4 rounded-xl bg-accent/10 border border-accent/30 w-full max-w-md">
+          ✓ Hold steady for: {feedback.count} {feedback.count === 1 ? 'second' : 'seconds'}
         </div>
       )
     case 'wrong':

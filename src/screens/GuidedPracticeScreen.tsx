@@ -131,12 +131,7 @@ export function GuidedPracticeScreen() {
     )
   }
 
-  const statusLabel =
-    practice.phase === 'hold'
-      ? 'Hold steady'
-      : practice.phase === 'correct'
-        ? 'Correct'
-        : 'Play'
+  const statusLabel = 'Play'
 
   return (
     <Layout title="Guided Practice" onBack={goBackToList}>

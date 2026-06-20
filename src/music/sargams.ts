@@ -164,6 +164,74 @@ export function getSargamsForOctave(baseOctave: number): Sargam[] {
 /** Default sargams at octave 5 (Middle Octave bansuri) for backward compatibility. */
 export const SARGAMS: Sargam[] = getSargamsForOctave(5)
 
+/** Ascending scale sequence for infinite loop practice. */
+export function getAscendingLoop(baseOctave: number): NoteTarget[] {
+  return ascendingScale(baseOctave)
+}
+
+/** Descending scale sequence for infinite loop practice. */
+export function getDescendingLoop(baseOctave: number): NoteTarget[] {
+  const upper = baseOctave + 1
+  return [
+    { note: 'SA', octave: upper },
+    { note: 'NI', octave: baseOctave },
+    { note: 'DHA', octave: baseOctave },
+    { note: 'PA', octave: baseOctave },
+    { note: 'MA', octave: baseOctave },
+    { note: 'GA', octave: baseOctave },
+    { note: 'RE', octave: baseOctave },
+    { note: 'SA', octave: baseOctave },
+  ]
+}
+
+const ALANKAR_PATTERNS: ((baseOctave: number) => NoteTarget[])[] = [
+  // Classic paltaa: Sa Re Sa, Re Ga Re, Ga Ma Ga …
+  (o) => buildAlankar(o),
+  // Triplets ascending: Sa Re Ga, Re Ga Ma, Ga Ma Pa …
+  (o) => {
+    const scale: IndianNote[] = ['SA', 'RE', 'GA', 'MA', 'PA', 'DHA', 'NI', 'SA']
+    const notes: NoteTarget[] = []
+    for (let i = 0; i <= scale.length - 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        const idx = i + j
+        notes.push({ note: scale[idx], octave: idx === 7 ? o + 1 : o })
+      }
+    }
+    return notes
+  },
+  // Up-down pairs: Sa Re Ga Re, Re Ga Ma Ga, Ga Ma Pa Ma …
+  (o) => {
+    const scale: IndianNote[] = ['SA', 'RE', 'GA', 'MA', 'PA', 'DHA', 'NI', 'SA']
+    const notes: NoteTarget[] = []
+    for (let i = 0; i <= scale.length - 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        const idx = i + j
+        notes.push({ note: scale[idx], octave: idx === 7 ? o + 1 : o })
+      }
+      const backIdx = i + 1
+      notes.push({ note: scale[backIdx], octave: backIdx === 7 ? o + 1 : o })
+    }
+    return notes
+  },
+  // Zigzag: Sa Re Sa, Re Ga Re, Ga Ma Ga, Ma Pa Ma …
+  (o) => {
+    const scale: IndianNote[] = ['SA', 'RE', 'GA', 'MA', 'PA', 'DHA', 'NI', 'SA']
+    const notes: NoteTarget[] = []
+    for (let i = 0; i <= scale.length - 2; i++) {
+      notes.push({ note: scale[i], octave: i === 7 ? o + 1 : o })
+      notes.push({ note: scale[i + 1], octave: (i + 1) === 7 ? o + 1 : o })
+      notes.push({ note: scale[i], octave: i === 7 ? o + 1 : o })
+    }
+    return notes
+  },
+]
+
+/** Pick a random alankar pattern for infinite loop practice. */
+export function getRandomAlankar(baseOctave: number): NoteTarget[] {
+  const idx = Math.floor(Math.random() * ALANKAR_PATTERNS.length)
+  return ALANKAR_PATTERNS[idx](baseOctave)
+}
+
 export function getSargamById(id: string): Sargam | undefined {
   return SARGAMS.find((s) => s.id === id)
 }
