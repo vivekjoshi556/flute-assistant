@@ -11,6 +11,7 @@ import { ScaleTrainerScreen } from './screens/ScaleTrainerScreen'
 import { ProgressScreen } from './screens/ProgressScreen'
 import { SargamPracticeScreen } from './screens/SargamPracticeScreen'
 import { SessionSummaryScreen } from './screens/SessionSummaryScreen'
+import { DifficultNotesPracticeScreen } from './screens/DifficultNotesPracticeScreen'
 import type { PracticeSession } from './types'
 
 function OnboardingGuard({ children }: { children: React.ReactNode }) {
@@ -97,6 +98,14 @@ function AppRoutes() {
         element={
           <OnboardingGuard>
             <SessionSummaryScreen />
+          </OnboardingGuard>
+        }
+      />
+      <Route
+        path="/practice/difficult-notes"
+        element={
+          <OnboardingGuard>
+            <DifficultNotesPracticeScreen />
           </OnboardingGuard>
         }
       />

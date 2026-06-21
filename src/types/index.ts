@@ -33,7 +33,7 @@ export interface NoteResult {
 
 export interface PracticeSession {
   id: string
-  mode: 'free' | 'guided' | 'scale' | 'sargam'
+  mode: 'free' | 'guided' | 'scale' | 'sargam' | 'difficult-notes'
   startTime: number
   endTime: number
   averageAccuracy: number

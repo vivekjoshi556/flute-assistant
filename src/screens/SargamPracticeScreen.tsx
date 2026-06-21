@@ -117,6 +117,13 @@ export function SargamPracticeScreen() {
     navigate('/session-summary')
   }
 
+  useEffect(() => {
+    if (practice.phase === 'done') {
+      finishSession()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [practice.phase])
+
   const bestScoreForSargam = (id: string) => {
     const sessions = stats.sessions.filter((s) => s.sargamId === id && s.sargamScore)
     if (sessions.length === 0) return null
@@ -207,25 +214,6 @@ export function SargamPracticeScreen() {
               </button>
             </div>
           </div>
-        </div>
-      </Layout>
-    )
-  }
-
-  if (practice.phase === 'done') {
-    return (
-      <Layout title="Sargam Complete" onBack={goBackToList}>
-        <div className="text-center space-y-6 py-12">
-          <span className="text-6xl">🎉</span>
-          <h2 className="text-2xl font-bold">{selected?.name}</h2>
-          <p className="text-text-muted">Sequence complete!</p>
-          <button
-            type="button"
-            onClick={finishSession}
-            className="px-8 py-3 rounded-full bg-accent/20 text-accent border border-accent/40"
-          >
-            View Summary
-          </button>
         </div>
       </Layout>
     )

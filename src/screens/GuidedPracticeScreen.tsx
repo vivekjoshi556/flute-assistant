@@ -99,6 +99,13 @@ export function GuidedPracticeScreen() {
     navigate('/session-summary')
   }
 
+  useEffect(() => {
+    if (practice.phase === 'done') {
+      finishSession()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [practice.phase])
+
   if (!started) {
     return (
       <Layout title="Guided Practice" backTo="/">
@@ -135,27 +142,6 @@ export function GuidedPracticeScreen() {
               <p className="text-sm text-text-muted mt-0.5">{opt.desc}</p>
             </button>
           ))}
-        </div>
-      </Layout>
-    )
-  }
-
-  if (practice.phase === 'done') {
-    return (
-      <Layout title="Exercise Complete" onBack={goBackToList}>
-        <div className="text-center space-y-6 py-12">
-          <span className="text-6xl">🎉</span>
-          <h2 className="text-2xl font-bold">Well done!</h2>
-          <p className="text-text-muted">
-            You completed {targets.length} notes.
-          </p>
-          <button
-            type="button"
-            onClick={finishSession}
-            className="px-8 py-3 rounded-full bg-accent/20 text-accent border border-accent/40"
-          >
-            View Summary
-          </button>
         </div>
       </Layout>
     )

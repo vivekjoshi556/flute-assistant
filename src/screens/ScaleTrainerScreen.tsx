@@ -178,6 +178,13 @@ export function ScaleTrainerScreen() {
     navigate('/session-summary')
   }
 
+  useEffect(() => {
+    if (isComplete) {
+      finishSession()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isComplete])
+
   if (!direction) {
     return (
       <Layout title="Scale Trainer" backTo="/">
@@ -221,24 +228,6 @@ export function ScaleTrainerScreen() {
           >
             <span className="font-medium">Descending</span>
             <p className="text-sm text-text-muted">Sa Ni Dha Pa Ma Ga Re Sa</p>
-          </button>
-        </div>
-      </Layout>
-    )
-  }
-
-  if (isComplete) {
-    return (
-      <Layout title="Scale Trainer" onBack={goBackToList}>
-        <div className="text-center space-y-6 py-12">
-          <span className="text-5xl">✓</span>
-          <h2 className="text-2xl font-bold">Scale Complete</h2>
-          <button
-            type="button"
-            onClick={finishSession}
-            className="px-8 py-3 rounded-full bg-accent/20 text-accent border border-accent/40"
-          >
-            View Summary
           </button>
         </div>
       </Layout>

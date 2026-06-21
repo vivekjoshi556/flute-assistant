@@ -64,6 +64,12 @@ export function HomeScreen() {
           icon="🪈"
         />
         <Card
+          to="/practice/difficult-notes"
+          title="Difficult Notes"
+          description="Focused practice on your 3 weakest notes"
+          icon="🎯"
+        />
+        <Card
           to="/reference"
           title="Note Reference"
           description="Hear and compare each note"

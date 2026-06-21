@@ -42,6 +42,8 @@ export function SessionSummaryScreen() {
       navigate('/scale-trainer')
     } else if (mode === 'free') {
       navigate('/practice/free')
+    } else if (mode === 'difficult-notes') {
+      navigate('/practice/difficult-notes')
     } else {
       navigate('/')
     }
@@ -59,6 +61,8 @@ export function SessionSummaryScreen() {
       navigate('/scale-trainer', { state: { autoStart: true, direction: scaleDirection, baseOctave } })
     } else if (mode === 'free') {
       navigate('/practice/free')
+    } else if (mode === 'difficult-notes') {
+      navigate('/practice/difficult-notes', { state: { autoStart: true } })
     } else {
       navigate('/')
     }
