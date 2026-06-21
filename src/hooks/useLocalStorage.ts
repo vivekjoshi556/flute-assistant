@@ -9,6 +9,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   bansuriType: 'middle',
   baseOctave: 5,
   onboardingComplete: false,
+  voiceNavigationEnabled: true,
 }
 
 const DEFAULT_STATS: UserStats = {
@@ -36,6 +37,9 @@ function migrateSettings(settings: AppSettings): AppSettings {
   }
   if (!migrated.bansuriType) {
     migrated.bansuriType = DEFAULT_SETTINGS.bansuriType
+  }
+  if (migrated.voiceNavigationEnabled === undefined) {
+    migrated.voiceNavigationEnabled = true
   }
   return migrated
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { Layout } from '../components/Layout'
@@ -8,8 +8,9 @@ import {
   getScaleTargets,
   randomNoteTargets,
 } from '../music/scales'
-import type { GuidedExerciseType } from '../types'
+import type { GuidedExerciseType, IndianNote } from '../types'
 import type { Register, NoteTarget } from '../music/register'
+import { useVoiceNavigation } from '../hooks/useVoiceNavigation'
 
 const EXERCISE_OPTIONS: { type: GuidedExerciseType; label: string; desc: string }[] = [
   { type: 'single', label: 'Single Notes', desc: 'Sa Re Ga Ma Pa Dha Ni Sa — one at a time' },
@@ -40,6 +41,27 @@ export function GuidedPracticeScreen() {
     fluteKey: settings.fluteKey,
     targets,
     enabled: started && targets.length > 0,
+  })
+
+  // Voice navigation mappings
+  const mappings = useMemo(() => ({
+    SA: { label: 'Single Notes', action: () => startExercise('single') },
+    RE: { label: 'Ascending', action: () => startExercise('ascending') },
+    GA: { label: 'Descending', action: () => startExercise('descending') },
+    MA: { label: 'Random', action: () => startExercise('random') },
+  }), [])
+
+  const actionMappings = useMemo(() => {
+    const res: any = {}
+    for (const [k, v] of Object.entries(mappings)) {
+      res[k] = v.action
+    }
+    return res
+  }, [mappings])
+
+  const voiceNav = useVoiceNavigation({
+    mappings: actionMappings,
+    enabled: !started && (settings.voiceNavigationEnabled ?? false),
   })
 
   useEffect(() => {
@@ -113,6 +135,12 @@ export function GuidedPracticeScreen() {
           Choose an exercise. Hints appear on the side when you struggle with a note.
         </p>
 
+        {voiceNav.error && settings.voiceNavigationEnabled && (
+          <p className="text-center text-danger text-xs mb-4">
+            🎙️ Navigation mic error: {voiceNav.error}
+          </p>
+        )}
+
         <div className="flex justify-center gap-2 mb-6">
           {registerOptions.map((opt) => (
             <button
@@ -130,18 +158,43 @@ export function GuidedPracticeScreen() {
           ))}
         </div>
 
-        <div className="grid gap-3 max-w-sm mx-auto">
-          {EXERCISE_OPTIONS.map((opt) => (
-            <button
-              key={opt.type}
-              type="button"
-              onClick={() => startExercise(opt.type)}
-              className="py-4 px-6 rounded-xl bg-surface-raised border border-border hover:border-accent transition-all text-left"
-            >
-              <span className="font-medium text-text">{opt.label}</span>
-              <p className="text-sm text-text-muted mt-0.5">{opt.desc}</p>
-            </button>
-          ))}
+        <div className="grid gap-3 max-w-sm mx-auto pb-16">
+          {EXERCISE_OPTIONS.map((opt, idx) => {
+            const noteHints: IndianNote[] = ['SA', 'RE', 'GA', 'MA']
+            const noteHint = noteHints[idx]
+            const isActive = voiceNav.activeKey === noteHint
+
+            return (
+              <button
+                key={opt.type}
+                type="button"
+                onClick={() => startExercise(opt.type)}
+                className={`relative py-4 px-6 rounded-xl bg-surface-raised border transition-all text-left overflow-hidden ${
+                  isActive
+                    ? 'border-accent shadow-[0_0_12px_rgba(52,211,153,0.15)] scale-[1.01]'
+                    : 'border-border hover:border-accent'
+                }`}
+              >
+                {noteHint && (
+                  <span className={`absolute top-4 right-4 text-[10px] font-extrabold tracking-wider border px-2 py-0.5 rounded-md font-mono uppercase shadow-sm transition-colors ${
+                    isActive
+                      ? 'bg-accent text-surface border-accent'
+                      : 'bg-accent/15 text-accent border-accent/30'
+                  }`}>
+                    {noteHint}
+                  </span>
+                )}
+                <span className="font-medium text-text">{opt.label}</span>
+                <p className="text-sm text-text-muted mt-0.5">{opt.desc}</p>
+                {isActive && voiceNav.holdProgress > 0 && (
+                  <div
+                    className="absolute bottom-0 left-0 h-1 bg-accent transition-all duration-75 ease-out shadow-[0_0_8px_var(--color-accent)]"
+                    style={{ width: `${voiceNav.holdProgress}%` }}
+                  />
+                )}
+              </button>
+            )
+          })}
         </div>
       </Layout>
     )

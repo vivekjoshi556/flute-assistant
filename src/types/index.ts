@@ -74,4 +74,5 @@ export interface AppSettings {
   bansuriType: BansuriType
   baseOctave: number
   onboardingComplete: boolean
+  voiceNavigationEnabled?: boolean
 }

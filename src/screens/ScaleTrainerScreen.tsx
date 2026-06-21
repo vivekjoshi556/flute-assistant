@@ -10,6 +10,7 @@ import { getNoteFrequency, matchToTarget, noteDistance } from '../music/notes'
 import type { NoteResult, PracticeSession } from '../types'
 import type { NoteTarget } from '../music/register'
 import type { Register } from '../music/register'
+import { useVoiceNavigation } from '../hooks/useVoiceNavigation'
 
 type ScaleDirection = 'ascending' | 'descending'
 
@@ -39,6 +40,25 @@ export function ScaleTrainerScreen() {
   const expectedFrequency = target
     ? getNoteFrequency(target.note, settings.fluteKey, target.octave)
     : null
+
+  // Voice Navigation for scale selection
+  const scaleMappings = useMemo(() => ({
+    SA: { label: 'Ascending', action: () => startScale('ascending') },
+    RE: { label: 'Descending', action: () => startScale('descending') },
+  }), [])
+
+  const scaleActionMappings = useMemo(() => {
+    const res: any = {}
+    for (const [k, v] of Object.entries(scaleMappings)) {
+      res[k] = v.action
+    }
+    return res
+  }, [scaleMappings])
+
+  const voiceNav = useVoiceNavigation({
+    mappings: scaleActionMappings,
+    enabled: !direction && (settings.voiceNavigationEnabled ?? false),
+  })
 
   const { points: chartPoints } = usePitchChart(
     reading.frequency,
@@ -186,6 +206,9 @@ export function ScaleTrainerScreen() {
   }, [isComplete])
 
   if (!direction) {
+    const isSaActive = voiceNav.activeKey === 'SA'
+    const isReActive = voiceNav.activeKey === 'RE'
+
     return (
       <Layout title="Scale Trainer" backTo="/">
         <div className="text-center mb-8">
@@ -194,6 +217,12 @@ export function ScaleTrainerScreen() {
             Sa Re Ga Ma Pa Dha Ni Sa — the shuddha scale for beginners.
           </p>
         </div>
+
+        {voiceNav.error && settings.voiceNavigationEnabled && (
+          <p className="text-center text-danger text-xs mb-4">
+            🎙️ Navigation mic error: {voiceNav.error}
+          </p>
+        )}
 
         <div className="flex justify-center gap-2 mb-6">
           {registerOptions.map((opt) => (
@@ -212,22 +241,56 @@ export function ScaleTrainerScreen() {
           ))}
         </div>
 
-        <div className="grid gap-3 max-w-sm mx-auto">
+        <div className="grid gap-3 max-w-sm mx-auto pb-16">
           <button
             type="button"
             onClick={() => startScale('ascending')}
-            className="py-4 px-6 rounded-xl bg-surface-raised border border-border hover:border-accent transition-all text-left"
+            className={`relative py-4 px-6 rounded-xl bg-surface-raised border transition-all text-left overflow-hidden ${
+              isSaActive
+                ? 'border-accent shadow-[0_0_12px_rgba(52,211,153,0.15)] scale-[1.01]'
+                : 'border-border hover:border-accent'
+            }`}
           >
+            <span className={`absolute top-4 right-4 text-[10px] font-extrabold tracking-wider border px-2 py-0.5 rounded-md font-mono uppercase shadow-sm transition-colors ${
+              isSaActive
+                ? 'bg-accent text-surface border-accent'
+                : 'bg-accent/15 text-accent border-accent/30'
+            }`}>
+              SA
+            </span>
             <span className="font-medium">Ascending</span>
             <p className="text-sm text-text-muted">Sa Re Ga Ma Pa Dha Ni Sa</p>
+            {isSaActive && voiceNav.holdProgress > 0 && (
+              <div
+                className="absolute bottom-0 left-0 h-1 bg-accent transition-all duration-75 ease-out shadow-[0_0_8px_var(--color-accent)]"
+                style={{ width: `${voiceNav.holdProgress}%` }}
+              />
+            )}
           </button>
           <button
             type="button"
             onClick={() => startScale('descending')}
-            className="py-4 px-6 rounded-xl bg-surface-raised border border-border hover:border-accent transition-all text-left"
+            className={`relative py-4 px-6 rounded-xl bg-surface-raised border transition-all text-left overflow-hidden ${
+              isReActive
+                ? 'border-accent shadow-[0_0_12px_rgba(52,211,153,0.15)] scale-[1.01]'
+                : 'border-border hover:border-accent'
+            }`}
           >
+            <span className={`absolute top-4 right-4 text-[10px] font-extrabold tracking-wider border px-2 py-0.5 rounded-md font-mono uppercase shadow-sm transition-colors ${
+              isReActive
+                ? 'bg-accent text-surface border-accent'
+                : 'bg-accent/15 text-accent border-accent/30'
+            }`}>
+              RE
+            </span>
             <span className="font-medium">Descending</span>
             <p className="text-sm text-text-muted">Sa Ni Dha Pa Ma Ga Re Sa</p>
+            {isReActive && voiceNav.holdProgress > 0 && (
+              <div
+                className="absolute bottom-0 left-0 h-1 bg-accent transition-all duration-75 ease-out shadow-[0_0_8px_var(--color-accent)]"
+                style={{ width: `${voiceNav.holdProgress}%` }}
+              />
+            )}
           </button>
         </div>
       </Layout>

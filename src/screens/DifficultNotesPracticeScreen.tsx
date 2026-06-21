@@ -6,6 +6,7 @@ import { PracticeLayout } from '../components/PracticeLayout'
 import { useTargetPractice } from '../hooks/useTargetPractice'
 import type { IndianNote, PracticeSession } from '../types'
 import type { NoteTarget } from '../music/register'
+import { useVoiceNavigation } from '../hooks/useVoiceNavigation'
 
 function getDifficultNotes(sessions: PracticeSession[]): { note: IndianNote; accuracy: number; isDefault: boolean }[] {
   // Filter for sessions that have note results
@@ -148,6 +149,24 @@ export function DifficultNotesPracticeScreen() {
   const [started, setStarted] = useState(false)
   const pendingStart = useRef(false)
 
+  // Voice Navigation for landing screen
+  const diffMappings = useMemo(() => ({
+    SA: { label: 'Start Practice', action: () => handleStart() },
+  }), [])
+
+  const diffActionMappings = useMemo(() => {
+    const res: any = {}
+    for (const [k, v] of Object.entries(diffMappings)) {
+      res[k] = v.action
+    }
+    return res
+  }, [diffMappings])
+
+  const voiceNav = useVoiceNavigation({
+    mappings: diffActionMappings,
+    enabled: !started && (settings.voiceNavigationEnabled ?? false),
+  })
+
   // 1. Analyze stats for weak spots
   const difficultList = useMemo(() => getDifficultNotes(stats.sessions), [stats.sessions])
 
@@ -211,15 +230,23 @@ export function DifficultNotesPracticeScreen() {
 
   if (!started) {
     const hasDefaults = difficultList.some((d) => d.isDefault)
+    const isActive = voiceNav.activeKey === 'SA'
+
     return (
       <Layout title="Difficult Notes" backTo="/">
-        <div className="max-w-lg mx-auto space-y-6">
+        <div className="max-w-lg mx-auto space-y-6 pb-16">
           <div className="text-center space-y-2">
             <h1 className="text-3xl font-bold text-text">Weak Spots Training</h1>
             <p className="text-sm text-text-muted leading-relaxed">
               Improve your stability and transitions on the notes you struggle with most. We've analyzed your last 10 practice sessions to curate a custom 2-3 minute training sequence.
             </p>
           </div>
+
+          {voiceNav.error && settings.voiceNavigationEnabled && (
+            <p className="text-center text-danger text-xs mb-4">
+              🎙️ Navigation mic error: {voiceNav.error}
+            </p>
+          )}
 
           <div className="bg-surface-overlay/30 border border-border/40 rounded-2xl p-6">
             <h2 className="text-xs font-semibold text-text-muted uppercase tracking-wider text-center mb-4">
@@ -264,9 +291,26 @@ export function DifficultNotesPracticeScreen() {
             <button
               type="button"
               onClick={handleStart}
-              className="w-full max-w-xs py-4 px-6 rounded-full bg-accent text-surface font-semibold hover:bg-accent/90 transition-all text-center shadow-lg hover:shadow-accent/20 cursor-pointer text-base hover:scale-[1.02] active:scale-[0.98]"
+              className={`relative w-full max-w-xs py-4 px-6 rounded-full font-semibold transition-all text-center shadow-lg cursor-pointer text-base hover:scale-[1.02] active:scale-[0.98] overflow-hidden ${
+                isActive
+                  ? 'bg-accent/90 text-surface border-2 border-accent shadow-[0_0_12px_rgba(52,211,153,0.3)]'
+                  : 'bg-accent text-surface hover:bg-accent/90 hover:shadow-accent/20'
+              }`}
             >
               Start Practice (30 Notes)
+              <span className={`absolute top-1/2 -translate-y-1/2 right-4 text-[10px] font-extrabold tracking-wider border px-2 py-0.5 rounded-md font-mono uppercase shadow-sm transition-colors ${
+                isActive
+                  ? 'bg-surface text-accent border-surface'
+                  : 'bg-surface/20 text-surface border-surface/30'
+              }`}>
+                SA
+              </span>
+              {isActive && voiceNav.holdProgress > 0 && (
+                <div
+                  className="absolute bottom-0 left-0 h-1 bg-surface transition-all duration-75 ease-out shadow-[0_0_8px_white]"
+                  style={{ width: `${voiceNav.holdProgress}%` }}
+                />
+              )}
             </button>
           </div>
         </div>

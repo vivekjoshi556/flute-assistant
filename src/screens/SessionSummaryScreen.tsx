@@ -1,13 +1,36 @@
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useMemo } from 'react'
 import { useApp } from '../context/AppContext'
 import { Layout } from '../components/Layout'
 import { formatDuration } from '../hooks/useLocalStorage'
 import type { IndianNote } from '../types'
+import { useVoiceNavigation } from '../hooks/useVoiceNavigation'
 
 export function SessionSummaryScreen() {
-  const { activeSession, saveSession, setActiveSession } = useApp()
+  const { activeSession, saveSession, setActiveSession, settings } = useApp()
   const navigate = useNavigate()
+
+  // Voice Navigation for summary actions
+  const summaryMappings = useMemo(() => ({
+    RE: { label: 'Repeat', action: () => handleRepeat() },
+    SA: { label: 'Done', action: () => handleDone() },
+  }), [activeSession])
+
+  const summaryActionMappings = useMemo(() => {
+    const res: any = {}
+    for (const [k, v] of Object.entries(summaryMappings)) {
+      res[k] = v.action
+    }
+    return res
+  }, [summaryMappings])
+
+  const voiceNav = useVoiceNavigation({
+    mappings: summaryActionMappings,
+    enabled: !!activeSession && (settings.voiceNavigationEnabled ?? false),
+  })
+
+  const isReActive = voiceNav.activeKey === 'RE'
+  const isSaActive = voiceNav.activeKey === 'SA'
 
   const savedRef = useRef(false)
 
@@ -133,20 +156,60 @@ export function SessionSummaryScreen() {
           </div>
         )}
 
+        {voiceNav.error && settings.voiceNavigationEnabled && (
+          <p className="text-center text-danger text-xs mb-4">
+            🎙️ Navigation mic error: {voiceNav.error}
+          </p>
+        )}
+
         <div className="space-y-3">
           <button
             type="button"
             onClick={handleRepeat}
-            className="w-full py-3 rounded-full bg-accent text-surface font-semibold hover:bg-accent/90 transition-colors"
+            className={`relative w-full py-3 rounded-full font-semibold transition-all overflow-hidden ${
+              isReActive
+                ? 'bg-accent/90 text-surface border-2 border-accent shadow-[0_0_12px_rgba(52,211,153,0.3)] scale-[1.01]'
+                : 'bg-accent text-surface hover:bg-accent/90'
+            }`}
           >
             Repeat Exercise
+            <span className={`absolute top-1/2 -translate-y-1/2 right-4 text-[10px] font-extrabold tracking-wider border px-2 py-0.5 rounded-md font-mono uppercase shadow-sm transition-colors ${
+              isReActive
+                ? 'bg-surface text-accent border-surface'
+                : 'bg-surface/20 text-surface border-surface/30'
+            }`}>
+              RE
+            </span>
+            {isReActive && voiceNav.holdProgress > 0 && (
+              <div
+                className="absolute bottom-0 left-0 h-1 bg-surface transition-all duration-75 ease-out shadow-[0_0_8px_white]"
+                style={{ width: `${voiceNav.holdProgress}%` }}
+              />
+            )}
           </button>
           <button
             type="button"
             onClick={handleDone}
-            className="w-full py-3 rounded-full bg-surface-raised border border-border text-text font-medium hover:bg-surface-overlay transition-colors"
+            className={`relative w-full py-3 rounded-full font-medium transition-all overflow-hidden ${
+              isSaActive
+                ? 'bg-surface-overlay text-text border-2 border-accent shadow-[0_0_12px_rgba(52,211,153,0.15)] scale-[1.01]'
+                : 'bg-surface-raised border border-border text-text hover:bg-surface-overlay'
+            }`}
           >
             Done
+            <span className={`absolute top-1/2 -translate-y-1/2 right-4 text-[10px] font-extrabold tracking-wider border px-2 py-0.5 rounded-md font-mono uppercase shadow-sm transition-colors ${
+              isSaActive
+                ? 'bg-accent text-surface border-accent'
+                : 'bg-accent/15 text-accent border-accent/30'
+            }`}>
+              SA
+            </span>
+            {isSaActive && voiceNav.holdProgress > 0 && (
+              <div
+                className="absolute bottom-0 left-0 h-1 bg-accent transition-all duration-75 ease-out shadow-[0_0_8px_var(--color-accent)]"
+                style={{ width: `${voiceNav.holdProgress}%` }}
+              />
+            )}
           </button>
         </div>
       </div>
