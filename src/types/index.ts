@@ -42,6 +42,9 @@ export interface PracticeSession {
   sargamId?: string
   sargamName?: string
   sargamScore?: number
+  guidedType?: GuidedExerciseType
+  scaleDirection?: 'ascending' | 'descending'
+  baseOctave?: number
 }
 
 export interface UserStats {

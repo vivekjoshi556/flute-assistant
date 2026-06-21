@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { Layout } from '../components/Layout'
 import { PracticeLayout } from '../components/PracticeLayout'
@@ -34,6 +34,7 @@ export function GuidedPracticeScreen() {
   const [targets, setTargets] = useState<NoteTarget[]>([])
   const [started, setStarted] = useState(false)
   const pendingStart = useRef(false)
+  const [selectedType, setSelectedType] = useState<GuidedExerciseType | null>(null)
 
   const practice = useTargetPractice({
     fluteKey: settings.fluteKey,
@@ -48,13 +49,39 @@ export function GuidedPracticeScreen() {
     }
   }, [targets, practice])
 
+  const isComplete = practice.phase === 'done'
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [started, isComplete])
+
   const startExercise = (type: GuidedExerciseType) => {
     let list = getScaleTargets(type === 'random' ? 'single' : type, baseOctave)
     if (type === 'random') list = randomNoteTargets(8, baseOctave)
     setTargets(list)
     setStarted(true)
     pendingStart.current = true
+    setSelectedType(type)
   }
+
+  const location = useLocation()
+
+  useEffect(() => {
+    if (location.state?.autoStart && location.state?.guidedType) {
+      const type = location.state.guidedType
+      const oct = location.state.baseOctave ?? settings.baseOctave
+      setBaseOctave(oct)
+      
+      // start exercise
+      let list = getScaleTargets(type === 'random' ? 'single' : type, oct)
+      if (type === 'random') list = randomNoteTargets(8, oct)
+      setTargets(list)
+      setStarted(true)
+      pendingStart.current = true
+      setSelectedType(type)
+      
+      navigate(location.pathname, { replace: true, state: {} })
+    }
+  }, [location.state, settings.baseOctave, navigate, location.pathname])
 
   const goBackToList = () => {
     practice.finishEarly()
@@ -64,7 +91,10 @@ export function GuidedPracticeScreen() {
 
   const finishSession = () => {
     practice.finishEarly()
-    const session = practice.buildSession('guided')
+    const session = practice.buildSession('guided', {
+      guidedType: selectedType || undefined,
+      baseOctave,
+    })
     setActiveSession(session)
     navigate('/session-summary')
   }

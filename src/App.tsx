@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { AppProvider } from './context/AppContext'
 import { useApp } from './context/AppContext'
 import { OnboardingScreen } from './screens/OnboardingScreen'
@@ -19,6 +19,16 @@ function OnboardingGuard({ children }: { children: React.ReactNode }) {
     return <Navigate to="/onboarding" replace />
   }
   return <>{children}</>
+}
+
+function ScrollToTop() {
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+
+  return null
 }
 
 function AppRoutes() {
@@ -100,6 +110,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <AppProvider
         activeSession={activeSession}
         setActiveSession={setActiveSession}

@@ -31,8 +31,37 @@ export function SessionSummaryScreen() {
   const accuracyByNote = groupAccuracy(activeSession.noteResults)
 
   const handleDone = () => {
+    if (!activeSession) return
+    const mode = activeSession.mode
     setActiveSession(null)
-    navigate('/')
+    if (mode === 'sargam') {
+      navigate('/practice/sargam')
+    } else if (mode === 'guided') {
+      navigate('/practice/guided')
+    } else if (mode === 'scale') {
+      navigate('/scale-trainer')
+    } else if (mode === 'free') {
+      navigate('/practice/free')
+    } else {
+      navigate('/')
+    }
+  }
+
+  const handleRepeat = () => {
+    if (!activeSession) return
+    const { mode, sargamId, guidedType, scaleDirection, baseOctave } = activeSession
+    setActiveSession(null)
+    if (mode === 'sargam' && sargamId) {
+      navigate('/practice/sargam', { state: { autoStartId: sargamId } })
+    } else if (mode === 'guided' && guidedType) {
+      navigate('/practice/guided', { state: { autoStart: true, guidedType, baseOctave } })
+    } else if (mode === 'scale' && scaleDirection) {
+      navigate('/scale-trainer', { state: { autoStart: true, direction: scaleDirection, baseOctave } })
+    } else if (mode === 'free') {
+      navigate('/practice/free')
+    } else {
+      navigate('/')
+    }
   }
 
   return (
@@ -100,13 +129,22 @@ export function SessionSummaryScreen() {
           </div>
         )}
 
-        <button
-          type="button"
-          onClick={handleDone}
-          className="w-full py-3 rounded-full bg-accent/20 text-accent border border-accent/40 font-medium"
-        >
-          Done
-        </button>
+        <div className="space-y-3">
+          <button
+            type="button"
+            onClick={handleRepeat}
+            className="w-full py-3 rounded-full bg-accent text-surface font-semibold hover:bg-accent/90 transition-colors"
+          >
+            Repeat Exercise
+          </button>
+          <button
+            type="button"
+            onClick={handleDone}
+            className="w-full py-3 rounded-full bg-surface-raised border border-border text-text font-medium hover:bg-surface-overlay transition-colors"
+          >
+            Done
+          </button>
+        </div>
       </div>
     </Layout>
   )

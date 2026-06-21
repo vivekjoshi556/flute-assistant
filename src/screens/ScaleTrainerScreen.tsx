@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { usePitchDetection } from '../hooks/usePitchDetection'
 import { usePitchChart } from '../hooks/usePitchChart'
@@ -85,6 +85,26 @@ export function ScaleTrainerScreen() {
     setMicOn(true)
   }
 
+  const location = useLocation()
+
+  useEffect(() => {
+    if (location.state?.autoStart && location.state?.direction) {
+      const dir = location.state.direction
+      const oct = location.state.baseOctave ?? settings.baseOctave
+      setBaseOctave(oct)
+      
+      const list = getScaleTargets(dir, oct)
+      setTargets(list)
+      setDirection(dir)
+      setCurrentIndex(0)
+      startTimeRef.current = Date.now()
+      noteResultsRef.current = []
+      setMicOn(true)
+      
+      navigate(location.pathname, { replace: true, state: {} })
+    }
+  }, [location.state, settings.baseOctave, navigate, location.pathname])
+
   // Keep a ref so the interval can access the latest reading without
   // forcing the effect to re-run on every pitch frame.
   const readingRef = useRef(reading)
@@ -124,6 +144,11 @@ export function ScaleTrainerScreen() {
     }
   }, [currentIndex, targets.length, direction])
 
+  const isComplete = targets.length > 0 && currentIndex >= targets.length
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [direction, isComplete])
+
   const goBackToList = () => {
     setMicOn(false)
     setDirection(null)
@@ -146,6 +171,8 @@ export function ScaleTrainerScreen() {
           : 0,
       bestAccuracy: accuracies.length > 0 ? Math.max(...accuracies) : 0,
       noteResults: results,
+      scaleDirection: direction || undefined,
+      baseOctave,
     }
     setActiveSession(session)
     navigate('/session-summary')
@@ -199,8 +226,6 @@ export function ScaleTrainerScreen() {
       </Layout>
     )
   }
-
-  const isComplete = currentIndex >= targets.length
 
   if (isComplete) {
     return (

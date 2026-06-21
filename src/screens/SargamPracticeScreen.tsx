@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { Layout } from '../components/Layout'
 import { PracticeLayout } from '../components/PracticeLayout'
@@ -40,6 +40,11 @@ export function SargamPracticeScreen() {
     }
   }, [selected, practice])
 
+  const isComplete = practice.phase === 'done'
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [started, isComplete])
+
   const startSargam = (sargam: Sargam) => {
     setSelected(sargam)
     setStarted(true)
@@ -72,6 +77,24 @@ export function SargamPracticeScreen() {
       notes,
     })
   }
+
+  const location = useLocation()
+
+  useEffect(() => {
+    if (location.state?.autoStartId) {
+      const id = location.state.autoStartId
+      if (id.startsWith('infinite-')) {
+        const type = id.replace('infinite-', '') as 'ascending' | 'descending' | 'alankar'
+        startInfinite(type)
+      } else {
+        const found = sargams.find((s) => s.id === id)
+        if (found) {
+          startSargam(found)
+        }
+      }
+      navigate(location.pathname, { replace: true, state: {} })
+    }
+  }, [location.state, sargams, navigate, location.pathname])
 
   const goBackToList = () => {
     practice.finishEarly()
