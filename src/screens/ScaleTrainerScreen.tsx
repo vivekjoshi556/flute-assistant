@@ -34,6 +34,8 @@ export function ScaleTrainerScreen() {
 
   const startTimeRef = useRef(0)
   const noteResultsRef = useRef<NoteResult[]>([])
+  const confirmCountRef = useRef(0)
+  const pendingCentsRef = useRef<number[]>([])
 
   const { reading, error } = usePitchDetection(settings.fluteKey, micOn)
   const target = targets[currentIndex] ?? null
@@ -102,6 +104,8 @@ export function ScaleTrainerScreen() {
     setCurrentIndex(0)
     startTimeRef.current = Date.now()
     noteResultsRef.current = []
+    confirmCountRef.current = 0
+    pendingCentsRef.current = []
     setMicOn(true)
   }
 
@@ -119,6 +123,8 @@ export function ScaleTrainerScreen() {
       setCurrentIndex(0)
       startTimeRef.current = Date.now()
       noteResultsRef.current = []
+      confirmCountRef.current = 0
+      pendingCentsRef.current = []
       setMicOn(true)
       
       navigate(location.pathname, { replace: true, state: {} })
@@ -130,6 +136,15 @@ export function ScaleTrainerScreen() {
   const readingRef = useRef(reading)
   readingRef.current = reading
 
+  // Reset confirmation state when the target changes.
+  useEffect(() => {
+    confirmCountRef.current = 0
+    pendingCentsRef.current = []
+  }, [currentIndex])
+
+  // Require 2 consecutive matching polls before advancing — same logic
+  // as useTargetPractice to filter transient/adjacent note detections.
+  const CONFIRM_POLLS = 2
   useEffect(() => {
     const interval = setInterval(() => {
       const r = readingRef.current
@@ -144,15 +159,28 @@ export function ScaleTrainerScreen() {
         settings.fluteKey,
       )
       if (matches && Math.abs(r.cents) <= 35) {
-        const accuracy = Math.max(0, 100 - Math.abs(r.cents) * 2)
-        noteResultsRef.current.push({
-          note: target.note,
-          expectedNote: target.note,
-          detectedNote: r.note,
-          accuracy,
-          durationHeld: 0.5,
-        })
-        setCurrentIndex((i) => i + 1)
+        confirmCountRef.current += 1
+        pendingCentsRef.current.push(Math.abs(r.cents))
+
+        if (confirmCountRef.current >= CONFIRM_POLLS) {
+          const avgCents =
+            pendingCentsRef.current.reduce((a, b) => a + b, 0) /
+            pendingCentsRef.current.length
+          const accuracy = Math.max(0, 100 - avgCents * 2)
+          noteResultsRef.current.push({
+            note: target.note,
+            expectedNote: target.note,
+            detectedNote: r.note,
+            accuracy,
+            durationHeld: 0.5,
+          })
+          confirmCountRef.current = 0
+          pendingCentsRef.current = []
+          setCurrentIndex((i) => i + 1)
+        }
+      } else {
+        confirmCountRef.current = 0
+        pendingCentsRef.current = []
       }
     }, 400)
     return () => clearInterval(interval)

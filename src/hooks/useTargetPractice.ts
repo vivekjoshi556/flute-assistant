@@ -14,6 +14,7 @@ import type { FeedbackState } from '../components/PracticeLayout'
 
 const CENTS_TOLERANCE = 35
 const CONFIDENCE_THRESHOLD = 0.65
+const CONFIRM_POLLS = 2 // consecutive matching polls required before advancing
 
 export type PracticePhase = 'play' | 'done'
 
@@ -41,6 +42,12 @@ export function useTargetPractice({
   const noteResultsRef = useRef<NoteResult[]>([])
   const [struggling, setStruggling] = useState(false)
 
+  // Consecutive-match confirmation state: require CONFIRM_POLLS consecutive
+  // matching readings before advancing to filter out transient/adjacent notes.
+  const confirmCountRef = useRef(0)
+  const pendingCentsRef = useRef<number[]>([])
+  const firstMatchTimeRef = useRef(0)
+
   const { reading, error } = usePitchDetection(fluteKey, micOn)
   const target = targets[currentIndex] ?? null
   const expectedFrequency = target
@@ -62,6 +69,9 @@ export function useTargetPractice({
   const start = useCallback(() => {
     startTimeRef.current = Date.now()
     noteResultsRef.current = []
+    confirmCountRef.current = 0
+    pendingCentsRef.current = []
+    firstMatchTimeRef.current = 0
     setCurrentIndex(0)
     setLoopCount(0)
     setPhase('play')
@@ -118,8 +128,16 @@ export function useTargetPractice({
   const readingRef = useRef(reading)
   readingRef.current = reading
 
-  // Advance immediately when the correct note is detected — no hold timer.
-  // This mirrors the scale trainer behaviour: hit the note and move forward.
+  // Reset confirmation state whenever the target note changes.
+  useEffect(() => {
+    confirmCountRef.current = 0
+    pendingCentsRef.current = []
+    firstMatchTimeRef.current = 0
+  }, [currentIndex])
+
+  // Advance only after CONFIRM_POLLS consecutive matching readings.
+  // This small delay (~400ms) filters transient/adjacent note detections
+  // and allows accuracy to be averaged over the confirmation window.
   useEffect(() => {
     if (phase !== 'play' || !target) return
 
@@ -129,31 +147,57 @@ export function useTargetPractice({
 
       const { matches } = matchToTarget(r.frequency, r.note, r.octave, target, fluteKey)
       if (matches && Math.abs(r.cents) <= CENTS_TOLERANCE) {
-        setStruggling(false)
-        const accuracy = Math.max(0, 100 - Math.abs(r.cents) * 2)
-        noteResultsRef.current.push({
-          note: target.note,
-          expectedNote: target.note,
-          detectedNote: r.note,
-          accuracy,
-          durationHeld: 0.5,
-        })
-
-        const next = currentIndex + 1
-        if (next >= targets.length) {
-          if (loop) {
-            setCurrentIndex(0)
-            setLoopCount((c) => c + 1)
-          } else {
-            setPhase('done')
-            setMicOn(false)
-            onComplete?.()
-          }
-        } else {
-          setCurrentIndex(next)
+        // Matching reading — accumulate confirmation
+        if (confirmCountRef.current === 0) {
+          firstMatchTimeRef.current = Date.now()
         }
-      } else if (r.isPlaying && r.note && !matches) {
-        setStruggling(true)
+        confirmCountRef.current += 1
+        pendingCentsRef.current.push(Math.abs(r.cents))
+
+        if (confirmCountRef.current >= CONFIRM_POLLS) {
+          // Confirmed — compute accuracy from averaged cents over the window
+          setStruggling(false)
+          const avgCents =
+            pendingCentsRef.current.reduce((a, b) => a + b, 0) /
+            pendingCentsRef.current.length
+          const accuracy = Math.max(0, 100 - avgCents * 2)
+          const holdDuration = (Date.now() - firstMatchTimeRef.current) / 1000
+
+          noteResultsRef.current.push({
+            note: target.note,
+            expectedNote: target.note,
+            detectedNote: r.note,
+            accuracy,
+            durationHeld: Math.max(0.4, holdDuration),
+          })
+
+          // Reset confirmation state for the next note
+          confirmCountRef.current = 0
+          pendingCentsRef.current = []
+          firstMatchTimeRef.current = 0
+
+          const next = currentIndex + 1
+          if (next >= targets.length) {
+            if (loop) {
+              setCurrentIndex(0)
+              setLoopCount((c) => c + 1)
+            } else {
+              setPhase('done')
+              setMicOn(false)
+              onComplete?.()
+            }
+          } else {
+            setCurrentIndex(next)
+          }
+        }
+      } else {
+        // Non-match — reset confirmation counter
+        confirmCountRef.current = 0
+        pendingCentsRef.current = []
+        firstMatchTimeRef.current = 0
+        if (r.isPlaying && r.note && !matches) {
+          setStruggling(true)
+        }
       }
     }, 400)
     return () => clearInterval(interval)

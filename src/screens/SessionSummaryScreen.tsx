@@ -7,7 +7,7 @@ import type { IndianNote } from '../types'
 import { useVoiceNavigation } from '../hooks/useVoiceNavigation'
 
 export function SessionSummaryScreen() {
-  const { activeSession, saveSession, setActiveSession, settings } = useApp()
+  const { activeSession, saveSession, setActiveSession, settings, stats } = useApp()
   const navigate = useNavigate()
 
   // Voice Navigation for summary actions
@@ -53,6 +53,24 @@ export function SessionSummaryScreen() {
   const { difficult, stable } = analyzeNotes(activeSession.noteResults)
   const accuracyByNote = groupAccuracy(activeSession.noteResults)
 
+  // Look up the historical best average accuracy for the same exercise.
+  // Exclude the current session (it was just saved above) by comparing IDs.
+  const historicalBest = (() => {
+    const past = stats.sessions.filter((s) => {
+      if (s.id === activeSession.id) return false
+      if (s.mode !== activeSession.mode) return false
+      if (activeSession.mode === 'sargam') return s.sargamId === activeSession.sargamId
+      if (activeSession.mode === 'guided')
+        return s.guidedType === activeSession.guidedType && s.baseOctave === activeSession.baseOctave
+      if (activeSession.mode === 'scale')
+        return s.scaleDirection === activeSession.scaleDirection && s.baseOctave === activeSession.baseOctave
+      return true // difficult-notes / free — match by mode alone
+    })
+    if (past.length === 0) return null
+    return Math.max(...past.map((s) => s.averageAccuracy))
+  })()
+  const isNewBest = historicalBest !== null && activeSession.averageAccuracy > historicalBest
+
   const handleDone = () => {
     if (!activeSession) return
     const mode = activeSession.mode
@@ -77,7 +95,7 @@ export function SessionSummaryScreen() {
     const { mode, sargamId, guidedType, scaleDirection, baseOctave } = activeSession
     setActiveSession(null)
     if (mode === 'sargam' && sargamId) {
-      navigate('/practice/sargam', { state: { autoStartId: sargamId } })
+      navigate('/practice/sargam', { state: { autoStartId: sargamId, baseOctave } })
     } else if (mode === 'guided' && guidedType) {
       navigate('/practice/guided', { state: { autoStart: true, guidedType, baseOctave } })
     } else if (mode === 'scale' && scaleDirection) {
@@ -125,6 +143,29 @@ export function SessionSummaryScreen() {
             <p className="text-xs text-text-muted">Best Accuracy</p>
           </div>
         </div>
+
+        {(historicalBest !== null || isNewBest) && (
+          <div className="bg-surface-raised border border-accent/30 rounded-xl p-4 text-center">
+            {isNewBest ? (
+              <>
+                <p className="text-sm text-accent font-medium">🏆 New Best!</p>
+                <p className="text-2xl font-bold text-accent mt-1">
+                  {Math.round(activeSession.averageAccuracy)}%
+                </p>
+                <p className="text-xs text-text-muted mt-1">
+                  Previous best: {Math.round(historicalBest)}%
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-text-muted">Best Score (All Time)</p>
+                <p className="text-2xl font-bold mt-1">
+                  {Math.round(historicalBest!)}%
+                </p>
+              </>
+            )}
+          </div>
+        )}
 
         {difficult.length > 0 && (
           <div className="bg-surface-raised border border-border rounded-xl p-4">

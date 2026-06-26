@@ -14,16 +14,27 @@ import {
   type SargamDifficulty,
 } from '../music/sargams'
 import { useVoiceNavigation } from '../hooks/useVoiceNavigation'
+import type { Register } from '../music/register'
 
 const DIFFICULTY_ORDER: SargamDifficulty[] = ['beginner', 'intermediate', 'advanced']
+
+function getRegisterOptions(baseOctave: number): { value: Register; label: string; octave: number }[] {
+  return [
+    { value: 'lower', label: 'Lower', octave: baseOctave - 1 },
+    { value: 'middle', label: 'Middle', octave: baseOctave },
+    { value: 'higher', label: 'Higher', octave: baseOctave + 1 },
+  ]
+}
 
 export function SargamPracticeScreen() {
   const { settings, setActiveSession, stats } = useApp()
   const navigate = useNavigate()
+  const registerOptions = getRegisterOptions(settings.baseOctave)
+  const [baseOctave, setBaseOctave] = useState(settings.baseOctave)
   const [selected, setSelected] = useState<Sargam | null>(null)
   const [started, setStarted] = useState(false)
   const pendingStart = useRef(false)
-  const sargams = useMemo(() => getSargamsForOctave(settings.baseOctave), [settings.baseOctave])
+  const sargams = useMemo(() => getSargamsForOctave(baseOctave), [baseOctave])
 
   // Get all sargams and infinite options mapped to 2-note transition sequences
   const sargamNavOrder = useMemo(() => [
@@ -94,15 +105,15 @@ export function SargamPracticeScreen() {
     let name = ''
     let description = ''
     if (type === 'ascending') {
-      notes = getAscendingLoop(settings.baseOctave)
+      notes = getAscendingLoop(baseOctave)
       name = 'Infinite Ascending'
       description = 'Loops ascending scale continuously.'
     } else if (type === 'descending') {
-      notes = getDescendingLoop(settings.baseOctave)
+      notes = getDescendingLoop(baseOctave)
       name = 'Infinite Descending'
       description = 'Loops descending scale continuously.'
     } else {
-      notes = getRandomAlankar(settings.baseOctave)
+      notes = getRandomAlankar(baseOctave)
       name = 'Infinite Random Alankar'
       description = 'Loops a random alankar pattern continuously.'
     }
@@ -121,11 +132,14 @@ export function SargamPracticeScreen() {
   useEffect(() => {
     if (location.state?.autoStartId) {
       const id = location.state.autoStartId
+      const oct = location.state.baseOctave ?? settings.baseOctave
+      setBaseOctave(oct)
       if (id.startsWith('infinite-')) {
         const type = id.replace('infinite-', '') as 'ascending' | 'descending' | 'alankar'
         startInfinite(type)
       } else {
-        const found = sargams.find((s) => s.id === id)
+        const octSargams = getSargamsForOctave(oct)
+        const found = octSargams.find((s) => s.id === id)
         if (found) {
           startSargam(found)
         }
@@ -150,6 +164,7 @@ export function SargamPracticeScreen() {
         ? practice.noteResults.reduce((a, r) => a + r.accuracy, 0) /
           practice.noteResults.length
         : 0,
+      baseOctave,
     })
     setActiveSession(session)
     navigate('/session-summary')
@@ -180,6 +195,23 @@ export function SargamPracticeScreen() {
             🎙️ Navigation mic error: {voiceNav.error}
           </p>
         )}
+
+        <div className="flex justify-center gap-2 mb-6">
+          {registerOptions.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => setBaseOctave(opt.octave)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                baseOctave === opt.octave
+                  ? 'bg-accent/20 text-accent border border-accent/40'
+                  : 'bg-surface-raised border border-border text-text-muted hover:text-text'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
 
         <div className="space-y-6 pb-16">
           {DIFFICULTY_ORDER.map((difficulty) => {
@@ -226,7 +258,7 @@ export function SargamPracticeScreen() {
                         <p className="text-sm text-text-muted mt-1">{sargam.description}</p>
                         <p className="text-xs text-accent/80 mt-2 tracking-wide">
                           {sargam.notes.map((n) =>
-                            n.octave > settings.baseOctave && n.note === 'SA' ? 'SA↑' : n.note,
+                            n.octave > baseOctave && n.note === 'SA' ? 'SA↑' : n.note,
                           ).join(' ')}
                         </p>
                         {isActive && voiceNav.holdProgress > 0 && (
@@ -305,7 +337,7 @@ export function SargamPracticeScreen() {
         chartPoints={practice.chartPoints}
         feedback={practice.feedback}
         fluteKey={settings.fluteKey}
-        baseOctave={settings.baseOctave}
+        baseOctave={baseOctave}
         showHints={practice.showHints}
         hintsAvailable
         statusLabel={isInfinite ? `Loop ${practice.loopCount + 1}` : 'Play'}
