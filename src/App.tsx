@@ -12,6 +12,9 @@ import { ProgressScreen } from './screens/ProgressScreen'
 import { SargamPracticeScreen } from './screens/SargamPracticeScreen'
 import { SessionSummaryScreen } from './screens/SessionSummaryScreen'
 import { DifficultNotesPracticeScreen } from './screens/DifficultNotesPracticeScreen'
+import { LessonsScreen } from './screens/LessonsScreen'
+import { LessonDetailScreen } from './screens/LessonDetailScreen'
+import { AlankarPracticeScreen } from './screens/AlankarPracticeScreen'
 import type { PracticeSession } from './types'
 
 function OnboardingGuard({ children }: { children: React.ReactNode }) {
@@ -90,6 +93,46 @@ function AppRoutes() {
         element={
           <OnboardingGuard>
             <SargamPracticeScreen />
+          </OnboardingGuard>
+        }
+      />
+      <Route
+        path="/practice/sargam/:sargamId"
+        element={
+          <OnboardingGuard>
+            <SargamPracticeScreen />
+          </OnboardingGuard>
+        }
+      />
+      <Route
+        path="/practice/alankar"
+        element={
+          <OnboardingGuard>
+            <AlankarPracticeScreen />
+          </OnboardingGuard>
+        }
+      />
+      <Route
+        path="/practice/alankar/:alankarId"
+        element={
+          <OnboardingGuard>
+            <AlankarPracticeScreen />
+          </OnboardingGuard>
+        }
+      />
+      <Route
+        path="/learn"
+        element={
+          <OnboardingGuard>
+            <LessonsScreen />
+          </OnboardingGuard>
+        }
+      />
+      <Route
+        path="/learn/:lessonId"
+        element={
+          <OnboardingGuard>
+            <LessonDetailScreen />
           </OnboardingGuard>
         }
       />

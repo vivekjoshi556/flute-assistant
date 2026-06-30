@@ -10,6 +10,7 @@ import { DetectionPanel } from './DetectionPanel'
 import { PitchTraceChart } from './PitchTraceChart'
 import { RegisterIndicator } from './RegisterIndicator'
 import { NoteHintsPanel } from './NoteHintsPanel'
+import { MetronomeControls } from './MetronomeControls'
 import type { ChartPoint } from '../hooks/usePitchChart'
 
 export type FeedbackState =
@@ -31,6 +32,7 @@ interface PracticeLayoutProps {
   baseOctave?: number
   showHints?: boolean
   hintsAvailable?: boolean
+  showMetronome?: boolean
   statusLabel?: string
   children?: ReactNode
   footer?: ReactNode
@@ -47,6 +49,7 @@ export function PracticeLayout({
   baseOctave = 5,
   showHints = false,
   hintsAvailable = true,
+  showMetronome = false,
   statusLabel = 'Play',
   children,
   footer,
@@ -90,6 +93,12 @@ export function PracticeLayout({
               {noteTargetLabel(n)}
             </span>
           ))}
+        </div>
+      )}
+
+      {showMetronome && (
+        <div className="max-w-md mx-auto w-full">
+          <MetronomeControls />
         </div>
       )}
 

@@ -72,6 +72,12 @@ export function HomeScreen() {
 
       <div className="grid sm:grid-cols-2 gap-4 mb-8">
         <Card
+          to="/learn"
+          title="Learn"
+          description="Structured lessons on swar, saptak, raag & more"
+          icon="📚"
+        />
+        <Card
           to="/practice/free"
           title="Free Practice"
           description="Play freely with real-time tuner feedback"
@@ -106,6 +112,12 @@ export function HomeScreen() {
           noteHint="MA"
           isActive={voiceNav.activeKey === 'MA'}
           progress={voiceNav.holdProgress}
+        />
+        <Card
+          to="/practice/alankar"
+          title="Alankar Practice"
+          description="30+ patterns — permutations, sliding windows & classics"
+          icon="🎶"
         />
         <Card
           to="/practice/difficult-notes"

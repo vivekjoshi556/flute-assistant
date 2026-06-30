@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { Layout } from '../components/Layout'
 import { PracticeLayout } from '../components/PracticeLayout'
@@ -29,6 +29,7 @@ function getRegisterOptions(baseOctave: number): { value: Register; label: strin
 export function SargamPracticeScreen() {
   const { settings, setActiveSession, stats } = useApp()
   const navigate = useNavigate()
+  const { sargamId: urlSargamId } = useParams<{ sargamId?: string }>()
   const registerOptions = getRegisterOptions(settings.baseOctave)
   const [baseOctave, setBaseOctave] = useState(settings.baseOctave)
   const [selected, setSelected] = useState<Sargam | null>(null)
@@ -94,10 +95,13 @@ export function SargamPracticeScreen() {
     window.scrollTo(0, 0)
   }, [started, isComplete])
 
-  const startSargam = (sargam: Sargam) => {
+  const startSargam = (sargam: Sargam, skipNav = false) => {
     setSelected(sargam)
     setStarted(true)
     pendingStart.current = true
+    if (!skipNav) {
+      navigate(`/practice/sargam/${sargam.id}`, { replace: true })
+    }
   }
 
   const startInfinite = (type: 'ascending' | 'descending' | 'alankar') => {
@@ -118,17 +122,37 @@ export function SargamPracticeScreen() {
       description = 'Loops a random alankar pattern continuously.'
     }
     
-    startSargam({
+    const infiniteSargam = {
       id: `infinite-${type}`,
       name,
       description,
-      difficulty: 'advanced',
+      difficulty: 'advanced' as const,
       notes,
-    })
+    }
+    setSelected(infiniteSargam)
+    setStarted(true)
+    pendingStart.current = true
+    navigate(`/practice/sargam/infinite-${type}`, { replace: true })
   }
 
   const location = useLocation()
 
+  // Auto-start from URL params (supports page refresh)
+  useEffect(() => {
+    if (urlSargamId && !started) {
+      if (urlSargamId.startsWith('infinite-')) {
+        const type = urlSargamId.replace('infinite-', '') as 'ascending' | 'descending' | 'alankar'
+        startInfinite(type)
+      } else {
+        const found = sargams.find((s) => s.id === urlSargamId)
+        if (found) {
+          startSargam(found, true)
+        }
+      }
+    }
+  }, [urlSargamId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Legacy: auto-start from location.state (for backward compat with other screens navigating here)
   useEffect(() => {
     if (location.state?.autoStartId) {
       const id = location.state.autoStartId
@@ -141,17 +165,18 @@ export function SargamPracticeScreen() {
         const octSargams = getSargamsForOctave(oct)
         const found = octSargams.find((s) => s.id === id)
         if (found) {
-          startSargam(found)
+          startSargam(found, true)
         }
       }
-      navigate(location.pathname, { replace: true, state: {} })
+      navigate(`/practice/sargam/${id}`, { replace: true, state: {} })
     }
-  }, [location.state, sargams, navigate, location.pathname])
+  }, [location.state, sargams, navigate, location.pathname]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const goBackToList = () => {
     practice.finishEarly()
     setStarted(false)
     setSelected(null)
+    navigate('/practice/sargam', { replace: true })
   }
 
   const finishSession = () => {
@@ -340,6 +365,7 @@ export function SargamPracticeScreen() {
         baseOctave={baseOctave}
         showHints={practice.showHints}
         hintsAvailable
+        showMetronome
         statusLabel={isInfinite ? `Loop ${practice.loopCount + 1}` : 'Play'}
         footer={
           <div className="flex justify-center pt-2">
