@@ -112,10 +112,10 @@ export function AlankarPracticeScreen() {
   const finishSession = () => {
     practice.finishEarly()
     if (!selected) return
-    const session = practice.buildSession('sargam', {
-      sargamId: selected.id,
-      sargamName: selected.name,
-      sargamScore:
+    const session = practice.buildSession('alankar', {
+      alankarId: selected.id,
+      alankarName: selected.name,
+      alankarScore:
         practice.noteResults.length > 0
           ? practice.noteResults.reduce((a, r) => a + r.accuracy, 0) /
             practice.noteResults.length
@@ -139,9 +139,13 @@ export function AlankarPracticeScreen() {
   }
 
   const bestScoreForAlankar = (id: string) => {
-    const sessions = stats.sessions.filter((s) => s.sargamId === id && s.sargamScore)
+    const sessions = stats.sessions.filter(
+      (s) =>
+        (s.alankarId === id && s.alankarScore !== undefined) ||
+        (s.sargamId === id && s.sargamScore !== undefined)
+    )
     if (sessions.length === 0) return null
-    return Math.max(...sessions.map((s) => s.sargamScore ?? 0))
+    return Math.max(...sessions.map((s) => s.alankarScore ?? s.sargamScore ?? 0))
   }
 
   // --- Practice view ---

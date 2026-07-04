@@ -33,7 +33,7 @@ export interface NoteResult {
 
 export interface PracticeSession {
   id: string
-  mode: 'free' | 'guided' | 'scale' | 'sargam' | 'difficult-notes'
+  mode: 'free' | 'guided' | 'scale' | 'sargam' | 'difficult-notes' | 'alankar'
   startTime: number
   endTime: number
   averageAccuracy: number
@@ -42,6 +42,9 @@ export interface PracticeSession {
   sargamId?: string
   sargamName?: string
   sargamScore?: number
+  alankarId?: string
+  alankarName?: string
+  alankarScore?: number
   guidedType?: GuidedExerciseType
   scaleDirection?: 'ascending' | 'descending'
   baseOctave?: number

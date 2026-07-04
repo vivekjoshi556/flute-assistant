@@ -60,6 +60,8 @@ export function SessionSummaryScreen() {
       if (s.id === activeSession.id) return false
       if (s.mode !== activeSession.mode) return false
       if (activeSession.mode === 'sargam') return s.sargamId === activeSession.sargamId
+      if (activeSession.mode === 'alankar')
+        return s.alankarId === activeSession.alankarId || s.sargamId === activeSession.alankarId
       if (activeSession.mode === 'guided')
         return s.guidedType === activeSession.guidedType && s.baseOctave === activeSession.baseOctave
       if (activeSession.mode === 'scale')
@@ -77,6 +79,8 @@ export function SessionSummaryScreen() {
     setActiveSession(null)
     if (mode === 'sargam') {
       navigate('/practice/sargam')
+    } else if (mode === 'alankar') {
+      navigate('/practice/alankar')
     } else if (mode === 'guided') {
       navigate('/practice/guided')
     } else if (mode === 'scale') {
@@ -92,10 +96,12 @@ export function SessionSummaryScreen() {
 
   const handleRepeat = () => {
     if (!activeSession) return
-    const { mode, sargamId, guidedType, scaleDirection, baseOctave } = activeSession
+    const { mode, sargamId, alankarId, guidedType, scaleDirection, baseOctave } = activeSession
     setActiveSession(null)
     if (mode === 'sargam' && sargamId) {
       navigate('/practice/sargam', { state: { autoStartId: sargamId, baseOctave } })
+    } else if (mode === 'alankar' && alankarId) {
+      navigate(`/practice/alankar/${alankarId}`)
     } else if (mode === 'guided' && guidedType) {
       navigate('/practice/guided', { state: { autoStart: true, guidedType, baseOctave } })
     } else if (mode === 'scale' && scaleDirection) {
@@ -117,13 +123,17 @@ export function SessionSummaryScreen() {
           <p className="text-4xl font-bold text-accent">{formatDuration(duration)}</p>
         </div>
 
-        {activeSession.sargamName && (
+        {(activeSession.sargamName || activeSession.alankarName) && (
           <div className="bg-surface-raised border border-accent/30 rounded-xl p-4 text-center">
-            <p className="text-sm text-text-muted">Sargam</p>
-            <p className="text-lg font-bold text-accent">{activeSession.sargamName}</p>
-            {activeSession.sargamScore !== undefined && (
+            <p className="text-sm text-text-muted">
+              {activeSession.mode === 'alankar' ? 'Alankar' : 'Sargam'}
+            </p>
+            <p className="text-lg font-bold text-accent">
+              {activeSession.alankarName || activeSession.sargamName}
+            </p>
+            {(activeSession.alankarScore !== undefined || activeSession.sargamScore !== undefined) && (
               <p className="text-2xl font-bold mt-1">
-                {Math.round(activeSession.sargamScore)}% overall
+                {Math.round((activeSession.alankarScore ?? activeSession.sargamScore ?? 0))}% overall
               </p>
             )}
           </div>
