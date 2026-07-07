@@ -14,7 +14,7 @@ export function MetronomeControls() {
           onClick={metronome.toggle}
           className={`relative w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all shrink-0 ${
             metronome.isRunning
-              ? 'border-accent bg-accent/15 text-accent shadow-[0_0_12px_rgba(52,211,153,0.2)]'
+              ? 'border-accent bg-accent/15 text-accent shadow-[0_0_12px_rgba(196,160,56,0.2)]'
               : 'border-border bg-surface-overlay text-text-muted hover:border-accent/50 hover:text-text'
           }`}
           title={metronome.isRunning ? 'Stop metronome' : 'Start metronome'}
@@ -50,7 +50,7 @@ export function MetronomeControls() {
                   className={`h-1.5 rounded-full transition-all duration-100 ${
                     i === metronome.currentBeat
                       ? i === 0
-                        ? 'bg-accent w-4 shadow-[0_0_6px_rgba(52,211,153,0.5)]'
+                        ? 'bg-accent w-4 shadow-[0_0_6px_rgba(196,160,56,0.5)]'
                         : 'bg-accent/70 w-3'
                       : 'bg-border w-2'
                   }`}

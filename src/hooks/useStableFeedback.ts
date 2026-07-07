@@ -6,7 +6,7 @@ const MIN_DISPLAY_MS = 1800
 function feedbackKey(f: FeedbackState): string {
   switch (f.type) {
     case 'wrong':
-      return `wrong-${f.expected}-${f.detected}`
+      return `wrong-${f.expectedLabel}-${f.detectedLabel}`
     case 'close':
       return `close-${Math.round(f.cents / 10)}`
     case 'register':

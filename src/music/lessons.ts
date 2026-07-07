@@ -87,7 +87,7 @@ export const LESSONS: Lesson[] = [
         type: 'text',
         title: 'What is a Swar?',
         content:
-          'In Indian classical music, a **swar** (स्वर) is a single musical note — the most fundamental unit of melody. The word comes from Sanskrit and literally means "that which shines by itself." Unlike Western music which uses the letters A through G, Indian music names its seven notes **Sa, Re, Ga, Ma, Pa, Dha, Ni**. These seven notes form a complete musical universe from which all melodies, raags, and compositions arise.\n\nThe concept of swar goes beyond mere pitch. Each swar carries an emotional character, a specific aesthetic quality called **rasa**. Ancient texts describe Sa as evoking steadfastness, Re as excitement, Ga as joy, and so on. When you play a note on your bansuri, you are not just producing a frequency — you are invoking a mood.',
+          'In Indian classical music, a **swar** (स्वर) is a single musical note — the most fundamental unit of melody. The word comes from Sanskrit and literally means "that which shines by itself." Indian music names its seven notes **Sa, Re, Ga, Ma, Pa, Dha, Ni** — and on the bansuri, each one corresponds to a specific fingering and breath pressure.\n\nThe concept of swar goes beyond mere pitch. Each swar carries an emotional character, a specific aesthetic quality called **rasa**. Ancient texts describe Sa as evoking steadfastness, Re as excitement, Ga as joy, and so on. When you play a note on your bansuri, you are not just producing a frequency — you are invoking a mood.',
       },
       {
         type: 'note-diagram',
@@ -98,24 +98,24 @@ export const LESSONS: Lesson[] = [
       },
       {
         type: 'comparison',
-        title: 'Full Names & Western Equivalents',
+        title: 'Full Sanskrit Names on the Bansuri',
         content:
-          'Each swar has a full Sanskrit name derived from ancient Vedic chanting traditions. Here is each swar with its full name and approximate Western equivalent:',
+          'Each swar has a full Sanskrit name derived from ancient Vedic chanting traditions. On the bansuri, Sa is your home note — all holes covered — and every other swar is measured as an interval from Sa:',
         items: [
-          { label: 'SA — Shadja (षड्ज)', description: 'The "birth of six" — foundation note. Equivalent to the tonic (Do). On a C-key bansuri, this is C.' },
-          { label: 'RE — Rishabh (ऋषभ)', description: 'Named after the bull — strong and assertive. Equivalent to the major 2nd (Re). On a C-key bansuri, this is D.' },
-          { label: 'GA — Gandhar (गान्धार)', description: 'Named after the Gandhara region — sweet and melodic. Equivalent to the major 3rd (Mi). On a C-key bansuri, this is E.' },
-          { label: 'MA — Madhyam (मध्यम)', description: 'The "middle" note — pivotal in the scale. Equivalent to the perfect 4th (Fa). On a C-key bansuri, this is F.' },
-          { label: 'PA — Pancham (पंचम)', description: 'The "fifth" — pure and resonant. Equivalent to the perfect 5th (Sol). On a C-key bansuri, this is G.' },
-          { label: 'DHA — Dhaivat (धैवत)', description: 'Associated with devotion and gravity. Equivalent to the major 6th (La). On a C-key bansuri, this is A.' },
-          { label: 'NI — Nishad (निषाद)', description: 'The "calling" note — creates tension before resolution to Sa. Equivalent to the major 7th (Ti). On a C-key bansuri, this is B.' },
+          { label: 'SA — Shadja (षड्ज)', description: 'The "birth of six" — your bansuri\'s tonic with all holes covered. The foundation from which every other swar is measured.' },
+          { label: 'RE — Rishabh (ऋषभ)', description: 'Named after the bull — strong and assertive. One whole tone above Sa on the bansuri.' },
+          { label: 'GA — Gandhar (गान्धार)', description: 'Named after the Gandhara region — sweet and melodic. Two whole tones above Sa.' },
+          { label: 'MA — Madhyam (मध्यम)', description: 'The "middle" note — pivotal in every raag. Two and a half tones above Sa; a narrower gap from Ga.' },
+          { label: 'PA — Pancham (पंचम)', description: 'The "fifth" — pure and resonant. Always a perfect fifth above Sa; never altered (achala).' },
+          { label: 'DHA — Dhaivat (धैवत)', description: 'Associated with devotion and gravity. Three and a half tones above Sa.' },
+          { label: 'NI — Nishad (निषाद)', description: 'The "calling" note — creates tension before resolution to Sa. Four and a half tones above Sa.' },
         ],
       },
       {
         type: 'tip',
-        title: 'Fixed vs. Movable Sa',
+        title: 'Movable Sa on Your Bansuri',
         content:
-          'Unlike Western music where C is always C regardless of key, **Sa is movable** — it is set to whatever pitch your bansuri is tuned to. If you have a G-key bansuri, your Sa = G. A D-key bansuri means Sa = D. Every other swar is then defined as an interval *relative* to Sa. This is why Indian musicians can play together on different-key instruments — they all agree on the intervals, not the absolute pitch. This concept is similar to the "movable Do" system in solfège.',
+          '**Sa is movable** — it is set to whatever pitch your bansuri is tuned to. If you have a longer bass bansuri, your Sa sits lower; a shorter flute gives a higher Sa. Every other swar is then defined as an interval *relative* to Sa, not by an absolute pitch name.\n\nThis is why two bansuri players on different-sized flutes can play together in the same raag — they agree on the intervals (Sa Re Ga Ma…), not on matching absolute frequencies. When you pick your bansuri key during onboarding, you are choosing which pitch becomes your Sa.',
       },
     ],
     keyTerms: [
@@ -165,7 +165,7 @@ export const LESSONS: Lesson[] = [
         type: 'text',
         title: 'What is a Saptak?',
         content:
-          'A **saptak** (सप्तक) literally means "a group of seven" — it is the Indian equivalent of an octave. Just as Western music divides the pitch spectrum into octaves (each doubling in frequency), Indian music divides it into saptaks. Each saptak contains the complete set of seven swaras from Sa to Ni.\n\nWhen you play Sa on your bansuri and then play higher notes until you reach the next Sa, you have traversed one saptak. The higher Sa vibrates at exactly twice the frequency of the lower Sa — this 2:1 ratio is the acoustic basis of the octave across all musical traditions.',
+          'A **saptak** (सप्तक) literally means "a group of seven" — it is the full span from one Sa to the next Sa on your bansuri. Each saptak contains the complete set of seven swaras from Sa to Ni.\n\nWhen you play Sa on your bansuri and then play higher notes until you reach the next Sa, you have traversed one saptak. The higher Sa vibrates at exactly twice the frequency of the lower Sa — this 2:1 ratio is the acoustic basis of the octave.',
       },
       {
         type: 'comparison',
@@ -239,28 +239,28 @@ export const LESSONS: Lesson[] = [
         type: 'text',
         title: 'The Pure Notes',
         content:
-          'The **shuddha swaras** (शुद्ध स्वर) are the seven "pure" or "natural" notes in their unaltered form. Together they form the shuddha saptak, which is equivalent to the Western major scale (specifically the Ionian mode). When someone says "Sa Re Ga Ma Pa Dha Ni" without any qualifier, they mean the shuddha forms.\n\nThe shuddha swaras define the **Bilawal thaat** — one of the 10 parent scales in Hindustani music. This scale is the reference point against which all alterations (komal and teevra) are measured. Think of shuddha swaras as the "default" setting — every other variation is a departure from this baseline.',
+          'The **shuddha swaras** (शुद्ध स्वर) are the seven "pure" or "natural" notes in their unaltered form. Together they form the shuddha saptak — the default scale on your bansuri with standard fingerings and no half-holes. When someone says "Sa Re Ga Ma Pa Dha Ni" without any qualifier, they mean the shuddha forms.\n\nThe shuddha swaras define the **Bilawal thaat** — one of the 10 parent scales in Hindustani music. This scale is the reference point against which all alterations (komal and teevra) are measured. Think of shuddha swaras as the "default" setting — every other variation is a departure from this baseline.',
       },
       {
         type: 'comparison',
-        title: 'Intervals Between Shuddha Swaras',
+        title: 'Intervals Between Shuddha Swaras on Bansuri',
         content:
-          'The intervals (gaps) between consecutive shuddha swaras follow a specific pattern of whole steps (W) and half steps (H). This pattern — W W H W W W H — is the same as the Western major scale:',
+          'The gaps between consecutive shuddha swaras follow a specific pattern. On the bansuri, whole-tone gaps feel like a full finger change; half-tone gaps (Ga→Ma and Ni→Sa) require tighter finger control:',
         items: [
-          { label: 'Sa → Re: Whole step (2 semitones)', description: 'A full tone gap. On a C bansuri, this is C→D.' },
-          { label: 'Re → Ga: Whole step (2 semitones)', description: 'Another full tone. C bansuri: D→E.' },
-          { label: 'Ga → Ma: Half step (1 semitone)', description: 'A narrow gap — this is where the scale "tightens." C bansuri: E→F.' },
-          { label: 'Ma → Pa: Whole step (2 semitones)', description: 'Full tone. C bansuri: F→G.' },
-          { label: 'Pa → Dha: Whole step (2 semitones)', description: 'Full tone. C bansuri: G→A.' },
-          { label: 'Dha → Ni: Whole step (2 semitones)', description: 'Full tone. C bansuri: A→B.' },
-          { label: 'Ni → Sa (upper): Half step (1 semitone)', description: 'The scale narrows again before resolving to the upper Sa. C bansuri: B→C.' },
+          { label: 'Sa → Re: Whole tone', description: 'A full tone gap — open one more hole from Sa. The most natural first step on the bansuri.' },
+          { label: 'Re → Ga: Whole tone', description: 'Another full tone — continue opening holes sequentially.' },
+          { label: 'Ga → Ma: Half tone', description: 'A narrow gap — the scale "tightens" here. This transition needs precise fingering on the bansuri.' },
+          { label: 'Ma → Pa: Whole tone', description: 'Full tone — a comfortable leap after the tight Ga→Ma interval.' },
+          { label: 'Pa → Dha: Whole tone', description: 'Full tone — Pa is achala (immovable) and very stable on the bansuri.' },
+          { label: 'Dha → Ni: Whole tone', description: 'Full tone — approaching the top of the madhya saptak.' },
+          { label: 'Ni → Sa (upper): Half tone', description: 'The scale narrows again before resolving to the upper Sa — another half-step to master.' },
         ],
       },
       {
         type: 'text',
         title: 'Frequency Ratios — The Acoustic Foundation',
         content:
-          'Ancient Indian theorists (like Bharata in the Natyashastra) described swaras through frequency ratios. In the just intonation system:\n\n• **Sa** = 1:1 (fundamental)\n• **Re** = 9:8\n• **Ga** = 5:4\n• **Ma** = 4:3\n• **Pa** = 3:2\n• **Dha** = 5:3\n• **Ni** = 15:8\n• **Upper Sa** = 2:1\n\nThe ratio 3:2 for Pa (Pancham) is the same as the Western "perfect fifth" — it is the most consonant interval after the octave and has been recognized as fundamental across virtually all musical cultures in the world.',
+          'Ancient Indian theorists (like Bharata in the Natyashastra) described swaras through frequency ratios relative to Sa:\n\n• **Sa** = 1:1 (fundamental — all holes covered)\n• **Re** = 9:8\n• **Ga** = 5:4\n• **Ma** = 4:3\n• **Pa** = 3:2\n• **Dha** = 5:3\n• **Ni** = 15:8\n• **Upper Sa** = 2:1\n\nThe ratio 3:2 for Pa (Pancham) makes it the most consonant swar after Sa itself — which is why Pa feels so stable and resonant on the bansuri.',
       },
       {
         type: 'tip',
@@ -271,7 +271,7 @@ export const LESSONS: Lesson[] = [
     ],
     keyTerms: [
       { term: 'Shuddha (शुद्ध)', definition: 'Pure or natural — the default, unaltered form of a swar.' },
-      { term: 'Bilawal Thaat', definition: 'The parent scale that uses all shuddha swaras — equivalent to the Western major scale.' },
+      { term: 'Bilawal Thaat', definition: 'The parent scale that uses all shuddha swaras — the default scale on your bansuri.' },
       { term: 'Semitone', definition: 'The smallest interval in standard tuning — a half step. There are 12 semitones in an octave.' },
     ],
     quiz: [
@@ -284,7 +284,7 @@ export const LESSONS: Lesson[] = [
           'W H W W W H W',
         ],
         correctIndex: 1,
-        explanation: 'The shuddha saptak follows the pattern Whole-Whole-Half-Whole-Whole-Whole-Half, identical to the Western major scale (Ionian mode).',
+        explanation: 'The shuddha saptak follows the pattern Whole-Whole-Half-Whole-Whole-Whole-Half — the natural interval layout on the bansuri from Sa to upper Sa.',
       },
       {
         question: 'Which two intervals in the shuddha saptak are half steps?',
@@ -301,7 +301,7 @@ export const LESSONS: Lesson[] = [
         question: 'What frequency ratio does Pancham (Pa) have with Sa?',
         options: ['2:1', '4:3', '3:2', '5:4'],
         correctIndex: 2,
-        explanation: 'Pa has a 3:2 ratio with Sa, making it a perfect fifth — the most consonant interval after the octave (2:1).',
+        explanation: 'Pa has a 3:2 ratio with Sa — the pancham interval. It is the most consonant swar after Sa and feels naturally stable on the bansuri.',
       },
     ],
     practiceLink: '/practice/guided',
@@ -335,10 +335,10 @@ export const LESSONS: Lesson[] = [
         content:
           'Each komal swar creates a distinct emotional shift compared to its shuddha counterpart:',
         items: [
-          { label: 'Komal Re (रे॒)', description: 'One semitone above Sa. Creates a tense, searching quality. On a C bansuri, Komal Re = D♭/C#. Used prominently in Raag Bhairav and Raag Marwa.' },
-          { label: 'Komal Ga (ग॒)', description: 'One semitone below Shuddha Ga (i.e., a minor 3rd above Sa). Gives a darker, more serious mood. On a C bansuri, Komal Ga = E♭. Central to Raag Malkauns and Raag Bageshri.' },
-          { label: 'Komal Dha (ध॒)', description: 'One semitone below Shuddha Dha (minor 6th). Adds pathos and gravity. On a C bansuri, Komal Dha = A♭. Featured in Raag Bhairavi and Raag Todi.' },
-          { label: 'Komal Ni (नि॒)', description: 'One semitone below Shuddha Ni (minor 7th). Creates restless tension before resolution. On a C bansuri, Komal Ni = B♭. Used in Raag Kafi and Raag Khamaj.' },
+          { label: 'Komal Re (रे॒)', description: 'One semitone above Sa — between Sa and shuddha Re. Use half-hole technique on the bansuri. Creates a tense, searching quality. Central to Raag Bhairav and Raag Marwa.' },
+          { label: 'Komal Ga (ग॒)', description: 'One semitone below shuddha Ga — a minor third above Sa. Gives a darker, more serious mood. Central to Raag Malkauns and Raag Bageshri.' },
+          { label: 'Komal Dha (ध॒)', description: 'One semitone below shuddha Dha — adds pathos and gravity. Featured in Raag Bhairavi and Raag Todi.' },
+          { label: 'Komal Ni (नि॒)', description: 'One semitone below shuddha Ni — creates restless tension before resolution to Sa. Used in Raag Kafi and Raag Khamaj.' },
         ],
       },
       {
@@ -405,33 +405,33 @@ export const LESSONS: Lesson[] = [
         type: 'text',
         title: 'The One Teevra Swar',
         content:
-          'In Indian classical music, **teevra** (तीव्र) means "sharp" or "intense." While komal lowers a note, teevra raises it. However, unlike the komal system which has four notes, only **one** swar can be made teevra: **Ma (Madhyam)**.\n\n**Teevra Ma** is raised by one semitone above its shuddha position. On a C-key bansuri, Shuddha Ma = F, and Teevra Ma = F# (F-sharp). This single alteration has a profound impact — Teevra Ma creates a bright, uplifting, yearning quality that defines some of the most beloved raags in Indian music.\n\nWhy only Ma? The system of 12 semitones in an octave means that each swar "occupies" certain chromatic positions. Lowering Re, Ga, Dha, Ni by a semitone and raising Ma by a semitone covers all 12 chromatic notes: Sa, komal Re, shuddha Re, komal Ga, shuddha Ga, shuddha Ma, teevra Ma, Pa, komal Dha, shuddha Dha, komal Ni, shuddha Ni.',
+          'In Indian classical music, **teevra** (तीव्र) means "sharp" or "intense." While komal lowers a note, teevra raises it. However, unlike the komal system which has four notes, only **one** swar can be made teevra: **Ma (Madhyam)**.\n\n**Teevra Ma** is raised by one semitone above its shuddha position on the bansuri — produced with a specific cross-fingering. This single alteration has a profound impact — Teevra Ma creates a bright, uplifting, yearning quality that defines some of the most beloved raags in Indian music.\n\nWhy only Ma? The system of 12 swar positions in an octave means that lowering Re, Ga, Dha, Ni by a semitone and raising Ma by a semitone covers all 12 positions: Sa, komal Re, shuddha Re, komal Ga, shuddha Ga, shuddha Ma, teevra Ma, Pa, komal Dha, shuddha Dha, komal Ni, shuddha Ni.',
       },
       {
         type: 'comparison',
-        title: 'Complete Chromatic Mapping',
+        title: 'All 12 Swar Positions',
         content:
-          'Here is how all 12 semitones in an octave map to Indian swar names (using C-key bansuri as reference):',
+          'Here is how all 12 swar positions in an octave map on the bansuri — from Sa through to upper Sa:',
         items: [
-          { label: 'C — Sa', description: 'The tonic, always shuddha.' },
-          { label: 'C#/D♭ — Komal Re', description: 'Re lowered by one semitone.' },
-          { label: 'D — Shuddha Re', description: 'Natural Re.' },
-          { label: 'D#/E♭ — Komal Ga', description: 'Ga lowered by one semitone.' },
-          { label: 'E — Shuddha Ga', description: 'Natural Ga.' },
-          { label: 'F — Shuddha Ma', description: 'Natural Ma (perfect 4th).' },
-          { label: 'F# — Teevra Ma', description: 'Ma raised by one semitone (tritone above Sa).' },
-          { label: 'G — Pa', description: 'Always shuddha (perfect 5th).' },
-          { label: 'G#/A♭ — Komal Dha', description: 'Dha lowered by one semitone.' },
-          { label: 'A — Shuddha Dha', description: 'Natural Dha.' },
-          { label: 'A#/B♭ — Komal Ni', description: 'Ni lowered by one semitone.' },
-          { label: 'B — Shuddha Ni', description: 'Natural Ni.' },
+          { label: 'Sa', description: 'The tonic — all holes covered. Always shuddha.' },
+          { label: 'Komal Re', description: 'Re lowered by one semitone — half-hole technique.' },
+          { label: 'Shuddha Re', description: 'Natural Re — standard fingering.' },
+          { label: 'Komal Ga', description: 'Ga lowered by one semitone — half-hole technique.' },
+          { label: 'Shuddha Ga', description: 'Natural Ga — standard fingering.' },
+          { label: 'Shuddha Ma', description: 'Natural Ma — the perfect fourth above Sa.' },
+          { label: 'Teevra Ma', description: 'Ma raised by one semitone — cross-fingering on the bansuri.' },
+          { label: 'Pa', description: 'Always shuddha (achala) — the pancham, a perfect fifth above Sa.' },
+          { label: 'Komal Dha', description: 'Dha lowered by one semitone — half-hole technique.' },
+          { label: 'Shuddha Dha', description: 'Natural Dha — standard fingering.' },
+          { label: 'Komal Ni', description: 'Ni lowered by one semitone — half-hole technique.' },
+          { label: 'Shuddha Ni', description: 'Natural Ni — standard fingering.' },
         ],
       },
       {
         type: 'text',
         title: 'Teevra Ma in Music',
         content:
-          'Teevra Ma is the defining note of the **Kalyan thaat** — one of the 10 parent scales. Raag Yaman (often the first raag taught to students) uses Teevra Ma, and its bright, romantic, evening quality comes largely from this one altered note.\n\nThe interval of Teevra Ma from Sa is a **tritone** (6 semitones, or an augmented 4th). In Western music, the tritone was historically called "diabolus in musica" (the devil in music) due to its dissonance. In Indian music, however, Teevra Ma is embraced for its expressive intensity — it creates a beautiful pull upward toward Pa.',
+          'Teevra Ma is the defining note of the **Kalyan thaat** — one of the 10 parent scales. Raag Yaman (often the first raag taught to students) uses Teevra Ma, and its bright, romantic, evening quality comes largely from this one altered note.\n\nTeevra Ma sits six semitones above Sa — an augmented fourth interval. On the bansuri, this note has a distinctive bright tension that pulls beautifully upward toward Pa. Indian musicians embrace this intensity; it is one of the most expressive notes in the entire system.',
       },
       {
         type: 'tip',
@@ -486,7 +486,7 @@ export const LESSONS: Lesson[] = [
         content:
           'Each thaat specifies exactly which form of each swar to use. Here they are with their signature alterations and mood:',
         items: [
-          { label: 'Bilawal', description: 'All shuddha swaras (Sa Re Ga Ma Pa Dha Ni). Bright, happy. Western major scale. Example: Raag Alhaiya Bilawal.' },
+          { label: 'Bilawal', description: 'All shuddha swaras (Sa Re Ga Ma Pa Dha Ni). Bright, happy — the default bansuri scale. Example: Raag Alhaiya Bilawal.' },
           { label: 'Kalyan', description: 'Teevra Ma, rest shuddha (Sa Re Ga Ma↑ Pa Dha Ni). Romantic, luminous evening mood. Example: Raag Yaman.' },
           { label: 'Khamaj', description: 'Komal Ni, rest shuddha (Sa Re Ga Ma Pa Dha ni). Light, romantic, playful. Example: Raag Khamaj, Raag Des.' },
           { label: 'Bhairav', description: 'Komal Re, Komal Dha, rest shuddha (Sa re Ga Ma Pa dha Ni). Solemn, majestic morning raag. Example: Raag Bhairav.' },
@@ -508,7 +508,7 @@ export const LESSONS: Lesson[] = [
     keyTerms: [
       { term: 'Thaat (ठाट)', definition: 'A parent scale of seven notes from which raags are derived. There are 10 standard thaats in Hindustani music.' },
       { term: 'Bhatkhande', definition: 'Vishnu Narayan Bhatkhande — the musicologist who formalized the 10-thaat classification system in the early 20th century.' },
-      { term: 'Bilawal Thaat', definition: 'The thaat with all shuddha swaras — equivalent to the Western major scale and the "default" reference.' },
+      { term: 'Bilawal Thaat', definition: 'The thaat with all shuddha swaras — the default reference scale on the bansuri.' },
     ],
     quiz: [
       {
@@ -694,7 +694,7 @@ export const LESSONS: Lesson[] = [
         type: 'text',
         title: 'What is Taal?',
         content:
-          'In Indian classical music, **taal** (ताल) is the rhythmic framework — a repeating cycle of beats that organizes music in time. Unlike Western time signatures which are linear (4/4, 3/4), taal is **cyclical**: when you reach the end of the cycle, you return to the beginning and start again. This cyclic nature is fundamental to Indian music and reflects a philosophical view of time as circular.\n\nA taal consists of a fixed number of beats (**matras**) grouped into sections (**vibhags**). The first beat of the cycle is called **sam** (सम) — it is the most important beat, where melodic phrases often resolve. Recognizing sam is essential for both solo and accompaniment playing.',
+          'In Indian classical music, **taal** (ताल) is the rhythmic framework — a repeating cycle of beats that organizes music in time. Taal is **cyclical**: when you reach the end of the cycle, you return to the beginning and start again. This cyclic nature is fundamental to Indian music and reflects a philosophical view of time as circular.\n\nA taal consists of a fixed number of beats (**matras**) grouped into sections (**vibhags**). The first beat of the cycle is called **sam** (सम) — it is the most important beat, where melodic phrases often resolve. Recognizing sam is essential for both solo and accompaniment playing.',
       },
       {
         type: 'comparison',
@@ -833,7 +833,7 @@ export const LESSONS: Lesson[] = [
         type: 'text',
         title: 'What are Alankars?',
         content:
-          '**Alankar** (अलंकार) literally means "ornament" or "decoration." In music, alankars are systematic note patterns used as practice exercises. They serve the same purpose as scales and arpeggios in Western music — building technique, finger dexterity, tonal accuracy, and musical vocabulary.\n\nBut alankars are more than just exercises. The patterns they contain appear everywhere in actual raag performance. By practicing alankars, you are unconsciously programming your fingers and breath with melodic shapes that will emerge naturally when you improvise. Great musicians practice alankars daily throughout their entire career.',
+          '**Alankar** (अलंकार) literally means "ornament" or "decoration." In music, alankars are systematic note patterns used as practice exercises on the bansuri. They build technique, finger dexterity, tonal accuracy, and musical vocabulary.\n\nBut alankars are more than just exercises. The patterns they contain appear everywhere in actual raag performance. By practicing alankars, you are unconsciously programming your fingers and breath with melodic shapes that will emerge naturally when you improvise. Great bansuri players practice alankars daily throughout their entire career.',
       },
       {
         type: 'comparison',
@@ -983,7 +983,7 @@ export const LESSONS: Lesson[] = [
         type: 'text',
         title: 'Ornamentation in Indian Music',
         content:
-          'Indian classical music places enormous importance on **ornamentation** — the subtle embellishments that bring notes to life. While Western classical music also has ornaments (trills, mordents, grace notes), Indian music\'s ornamental vocabulary is far more extensive and is considered essential, not optional.\n\nOn the bansuri, these ornaments are particularly expressive because the instrument\'s open holes allow for smooth pitch manipulation. A bansuri player\'s artistry is often judged more by the quality of their ornaments than by the notes themselves.',
+          'Indian classical music places enormous importance on **ornamentation** — the subtle embellishments that bring notes to life on the bansuri. These ornaments are considered essential, not optional — they are what transform a sequence of notes into music.\n\nOn the bansuri, ornamentation is particularly expressive because the instrument\'s open holes allow for smooth pitch manipulation. A bansuri player\'s artistry is often judged more by the quality of their meend, gamak, and kan swar than by the notes themselves.',
       },
       {
         type: 'comparison',
@@ -1057,7 +1057,7 @@ export const LESSONS: Lesson[] = [
         type: 'text',
         title: 'The Foundation of Bansuri Playing',
         content:
-          'On the bansuri, **your breath IS the instrument.** Unlike a guitar where strings vibrate independently, or a piano where hammers strike, the bansuri produces sound entirely through the player\'s breath stream. The quality of your tone — warm or thin, rich or breathy, focused or diffused — depends almost entirely on how you control your breath and embouchure.\n\nThis makes the bansuri both deceptively simple (just blow into a tube) and extraordinarily difficult to master (producing a beautiful, consistent tone requires years of practice). The good news: even small improvements in breath technique create dramatic improvements in sound quality.',
+          'On the bansuri, **your breath IS the instrument.** The bansuri produces sound entirely through the player\'s breath stream — there are no strings, reeds, or keys to do the work for you. The quality of your tone — warm or thin, rich or breathy, focused or diffused — depends almost entirely on how you control your breath and embouchure.\n\nThis makes the bansuri both deceptively simple (just blow into a tube) and extraordinarily difficult to master (producing a beautiful, consistent tone requires years of practice). The good news: even small improvements in breath technique create dramatic improvements in sound quality.',
       },
       {
         type: 'comparison',

@@ -14,6 +14,8 @@ import { SessionSummaryScreen } from './screens/SessionSummaryScreen'
 import { DifficultNotesPracticeScreen } from './screens/DifficultNotesPracticeScreen'
 import { LessonsScreen } from './screens/LessonsScreen'
 import { LessonDetailScreen } from './screens/LessonDetailScreen'
+import { LessonExercisesScreen } from './screens/LessonExercisesScreen'
+import { LessonExerciseDetailScreen } from './screens/LessonExerciseDetailScreen'
 import { AlankarPracticeScreen } from './screens/AlankarPracticeScreen'
 import type { PracticeSession } from './types'
 
@@ -125,6 +127,22 @@ function AppRoutes() {
         element={
           <OnboardingGuard>
             <LessonsScreen />
+          </OnboardingGuard>
+        }
+      />
+      <Route
+        path="/learn/exercises"
+        element={
+          <OnboardingGuard>
+            <LessonExercisesScreen />
+          </OnboardingGuard>
+        }
+      />
+      <Route
+        path="/learn/exercises/:exerciseId"
+        element={
+          <OnboardingGuard>
+            <LessonExerciseDetailScreen />
           </OnboardingGuard>
         }
       />

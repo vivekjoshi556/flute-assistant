@@ -219,7 +219,7 @@ export function SessionSummaryScreen() {
             onClick={handleRepeat}
             className={`relative w-full py-3 rounded-full font-semibold transition-all overflow-hidden ${
               isReActive
-                ? 'bg-accent/90 text-surface border-2 border-accent shadow-[0_0_12px_rgba(52,211,153,0.3)] scale-[1.01]'
+                ? 'bg-accent/90 text-surface border-2 border-accent shadow-[0_0_12px_rgba(196,160,56,0.3)] scale-[1.01]'
                 : 'bg-accent text-surface hover:bg-accent/90'
             }`}
           >
@@ -243,7 +243,7 @@ export function SessionSummaryScreen() {
             onClick={handleDone}
             className={`relative w-full py-3 rounded-full font-medium transition-all overflow-hidden ${
               isSaActive
-                ? 'bg-surface-overlay text-text border-2 border-accent shadow-[0_0_12px_rgba(52,211,153,0.15)] scale-[1.01]'
+                ? 'bg-surface-overlay text-text border-2 border-accent shadow-[0_0_12px_rgba(196,160,56,0.15)] scale-[1.01]'
                 : 'bg-surface-raised border border-border text-text hover:bg-surface-overlay'
             }`}
           >

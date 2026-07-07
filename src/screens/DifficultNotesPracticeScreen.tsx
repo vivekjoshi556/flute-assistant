@@ -293,7 +293,7 @@ export function DifficultNotesPracticeScreen() {
               onClick={handleStart}
               className={`relative w-full max-w-xs py-4 px-6 rounded-full font-semibold transition-all text-center shadow-lg cursor-pointer text-base hover:scale-[1.02] active:scale-[0.98] overflow-hidden ${
                 isActive
-                  ? 'bg-accent/90 text-surface border-2 border-accent shadow-[0_0_12px_rgba(52,211,153,0.3)]'
+                  ? 'bg-accent/90 text-surface border-2 border-accent shadow-[0_0_12px_rgba(196,160,56,0.3)]'
                   : 'bg-accent text-surface hover:bg-accent/90 hover:shadow-accent/20'
               }`}
             >
@@ -329,6 +329,7 @@ export function DifficultNotesPracticeScreen() {
         reading={practice.reading}
         chartPoints={practice.chartPoints}
         feedback={practice.feedback}
+        targetCents={practice.targetCents}
         fluteKey={settings.fluteKey}
         baseOctave={settings.baseOctave}
         showHints={practice.showHints}

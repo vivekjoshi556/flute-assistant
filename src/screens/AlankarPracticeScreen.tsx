@@ -159,6 +159,7 @@ export function AlankarPracticeScreen() {
           reading={practice.reading}
           chartPoints={practice.chartPoints}
           feedback={practice.feedback}
+          targetCents={practice.targetCents}
           fluteKey={settings.fluteKey}
           baseOctave={baseOctave}
           showHints={practice.showHints}

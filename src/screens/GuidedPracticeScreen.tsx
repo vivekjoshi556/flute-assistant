@@ -171,7 +171,7 @@ export function GuidedPracticeScreen() {
                 onClick={() => startExercise(opt.type)}
                 className={`relative py-4 px-6 rounded-xl bg-surface-raised border transition-all text-left overflow-hidden ${
                   isActive
-                    ? 'border-accent shadow-[0_0_12px_rgba(52,211,153,0.15)] scale-[1.01]'
+                    ? 'border-accent shadow-[0_0_12px_rgba(196,160,56,0.15)] scale-[1.01]'
                     : 'border-border hover:border-accent'
                 }`}
               >
@@ -211,6 +211,7 @@ export function GuidedPracticeScreen() {
         reading={practice.reading}
         chartPoints={practice.chartPoints}
         feedback={practice.feedback}
+        targetCents={practice.targetCents}
         fluteKey={settings.fluteKey}
         baseOctave={settings.baseOctave}
         showHints={practice.showHints}

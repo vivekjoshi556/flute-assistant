@@ -23,7 +23,7 @@ export function Layout({
   }
 
   return (
-    <div className="min-h-dvh flex flex-col max-w-3xl mx-auto px-4 py-6">
+    <div className="min-h-dvh flex flex-col max-w-5xl mx-auto px-5 sm:px-8 py-5">
       <header className="flex items-center justify-between mb-6">
         {onBack ? (
           <button
@@ -98,7 +98,7 @@ export function Card({
       to={to}
       className={`relative block bg-surface-raised border rounded-2xl p-6 hover:bg-surface-overlay transition-all group overflow-hidden ${
         isActive
-          ? 'border-accent shadow-[0_0_12px_rgba(52,211,153,0.15)] scale-[1.01]'
+          ? 'border-accent shadow-[0_0_12px_rgba(196,160,56,0.15)] scale-[1.01]'
           : 'border-border hover:border-accent/40'
       }`}
     >

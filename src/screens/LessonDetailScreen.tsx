@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { getLessonById, getNextLesson, getPrevLesson } from '../music/lessons'
+import { getExercisesByLesson } from '../music/lessonExercises'
 import { useLessonProgress } from './LessonsScreen'
 import { useTonePlayer } from '../hooks/useTonePlayer'
 import { useApp } from '../context/AppContext'
@@ -17,6 +18,7 @@ export function LessonDetailScreen() {
   const lesson = lessonId ? getLessonById(lessonId) : undefined
   const prevLesson = lessonId ? getPrevLesson(lessonId) : undefined
   const nextLesson = lessonId ? getNextLesson(lessonId) : undefined
+  const exercises = lessonId ? getExercisesByLesson(lessonId) : []
 
   // Quiz State
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({})
@@ -63,7 +65,7 @@ export function LessonDetailScreen() {
 
   return (
     <Layout title={lesson.title} onBack={() => navigate('/learn')}>
-      <div className="max-w-3xl mx-auto p-4 space-y-8 pb-32">
+      <div className="space-y-8 pb-24">
         {/* Header */}
         <div className="text-center space-y-4 pb-6 border-b border-border">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-surface-raised border border-border text-3xl">
@@ -131,6 +133,43 @@ export function LessonDetailScreen() {
             </section>
           ))}
         </div>
+
+        {/* Practice Exercises */}
+        {exercises.length > 0 && (
+          <div className="rounded-xl border border-accent/20 bg-accent/5 p-6">
+            <h2 className="mb-1 flex items-center gap-2 text-lg font-bold text-text">
+              <span>🪈</span> Practice Exercises
+            </h2>
+            <p className="mb-4 text-sm text-text-muted">
+              Put this lesson into practice on your bansuri — on separate pages, ready when you are.
+            </p>
+            <div className="space-y-2">
+              {exercises.map((ex) => (
+                <Link
+                  key={ex.id}
+                  to={`/learn/exercises/${ex.id}`}
+                  className="flex items-center justify-between rounded-lg border border-border bg-surface-raised px-4 py-3 transition-all hover:border-accent/40 hover:bg-surface-overlay group"
+                >
+                  <div>
+                    <p className="font-medium text-text group-hover:text-accent transition-colors">
+                      {ex.title}
+                    </p>
+                    <p className="text-xs text-text-muted mt-0.5">
+                      ~{ex.estimatedMinutes} min · {ex.notes.length} notes
+                    </p>
+                  </div>
+                  <span className="text-text-muted group-hover:text-accent">→</span>
+                </Link>
+              ))}
+            </div>
+            <Link
+              to="/learn/exercises"
+              className="mt-4 inline-block text-sm text-accent hover:underline"
+            >
+              View all lesson exercises
+            </Link>
+          </div>
+        )}
 
         {/* Key Terms */}
         {lesson.keyTerms && lesson.keyTerms.length > 0 && (
@@ -228,13 +267,13 @@ export function LessonDetailScreen() {
                 <p className="text-text-muted mb-6">
                   You scored {Object.values(selectedAnswers).reduce((score, ans, i) => ans === lesson.quiz[i].correctIndex ? score + 1 : score, 0)} out of {lesson.quiz.length}.
                 </p>
-                {lesson.practiceLink && (
-                  <button
-                    onClick={() => navigate(lesson.practiceLink!)}
-                    className="px-6 py-3 bg-accent text-surface-raised rounded-full font-bold inline-block hover:brightness-110 transition-all"
+                {exercises.length > 0 && (
+                  <Link
+                    to={`/learn/exercises/${exercises[0].id}`}
+                    className="inline-block rounded-full bg-accent px-6 py-3 font-bold text-surface-raised transition-all hover:brightness-110"
                   >
-                    Go to Practice Exercise
-                  </button>
+                    Start Practice Exercise
+                  </Link>
                 )}
               </div>
             )}

@@ -6,7 +6,8 @@ import { usePitchChart } from '../hooks/usePitchChart'
 import { Layout } from '../components/Layout'
 import { PracticeLayout, type FeedbackState } from '../components/PracticeLayout'
 import { getScaleTargets } from '../music/scales'
-import { getNoteFrequency, matchToTarget, noteDistance } from '../music/notes'
+import { matchToTarget, getTargetFrequency, noteTargetLabel } from '../music/register'
+import { noteDistance } from '../music/notes'
 import type { NoteResult, PracticeSession } from '../types'
 import type { NoteTarget } from '../music/register'
 import type { Register } from '../music/register'
@@ -40,7 +41,7 @@ export function ScaleTrainerScreen() {
   const { reading, error } = usePitchDetection(settings.fluteKey, micOn)
   const target = targets[currentIndex] ?? null
   const expectedFrequency = target
-    ? getNoteFrequency(target.note, settings.fluteKey, target.octave)
+    ? getTargetFrequency(target, settings.fluteKey)
     : null
 
   // Voice Navigation for scale selection
@@ -78,8 +79,8 @@ export function ScaleTrainerScreen() {
     if (reading.note && reading.note !== target.note) {
       return {
         type: 'wrong',
-        expected: target.note,
-        detected: reading.note,
+        expectedLabel: noteTargetLabel(target, baseOctave),
+        detectedLabel: reading.note,
         distance: noteDistance(target.note, reading.note),
       }
     }
@@ -95,7 +96,13 @@ export function ScaleTrainerScreen() {
       }
     }
     return { type: 'idle' }
-  }, [target, reading])
+  }, [target, reading, baseOctave])
+
+  const targetCents = useMemo(() => {
+    if (!target || !reading.isPlaying || reading.frequency <= 0) return 0
+    const expected = getTargetFrequency(target, settings.fluteKey)
+    return Math.round(1200 * Math.log2(reading.frequency / expected))
+  }, [target, reading.isPlaying, reading.frequency, settings.fluteKey])
 
   const startScale = (dir: ScaleDirection) => {
     const list = getScaleTargets(dir, baseOctave)
@@ -158,25 +165,31 @@ export function ScaleTrainerScreen() {
         target,
         settings.fluteKey,
       )
-      if (matches && Math.abs(r.cents) <= 35) {
-        confirmCountRef.current += 1
-        pendingCentsRef.current.push(Math.abs(r.cents))
+      if (matches) {
+        const expected = getTargetFrequency(target, settings.fluteKey)
+        const centsOff = r.frequency > 0
+          ? Math.abs(1200 * Math.log2(r.frequency / expected))
+          : 999
+        if (centsOff <= 35) {
+          confirmCountRef.current += 1
+          pendingCentsRef.current.push(centsOff)
 
-        if (confirmCountRef.current >= CONFIRM_POLLS) {
-          const avgCents =
-            pendingCentsRef.current.reduce((a, b) => a + b, 0) /
-            pendingCentsRef.current.length
-          const accuracy = Math.max(0, 100 - avgCents * 2)
-          noteResultsRef.current.push({
-            note: target.note,
-            expectedNote: target.note,
-            detectedNote: r.note,
-            accuracy,
-            durationHeld: 0.5,
-          })
-          confirmCountRef.current = 0
-          pendingCentsRef.current = []
-          setCurrentIndex((i) => i + 1)
+          if (confirmCountRef.current >= CONFIRM_POLLS) {
+            const avgCents =
+              pendingCentsRef.current.reduce((a, b) => a + b, 0) /
+              pendingCentsRef.current.length
+            const accuracy = Math.max(0, 100 - avgCents * 2)
+            noteResultsRef.current.push({
+              note: target.note,
+              expectedNote: target.note,
+              detectedNote: r.note,
+              accuracy,
+              durationHeld: 0.5,
+            })
+            confirmCountRef.current = 0
+            pendingCentsRef.current = []
+            setCurrentIndex((i) => i + 1)
+          }
         }
       } else {
         confirmCountRef.current = 0
@@ -275,7 +288,7 @@ export function ScaleTrainerScreen() {
             onClick={() => startScale('ascending')}
             className={`relative py-4 px-6 rounded-xl bg-surface-raised border transition-all text-left overflow-hidden ${
               isSaActive
-                ? 'border-accent shadow-[0_0_12px_rgba(52,211,153,0.15)] scale-[1.01]'
+                ? 'border-accent shadow-[0_0_12px_rgba(196,160,56,0.15)] scale-[1.01]'
                 : 'border-border hover:border-accent'
             }`}
           >
@@ -300,7 +313,7 @@ export function ScaleTrainerScreen() {
             onClick={() => startScale('descending')}
             className={`relative py-4 px-6 rounded-xl bg-surface-raised border transition-all text-left overflow-hidden ${
               isReActive
-                ? 'border-accent shadow-[0_0_12px_rgba(52,211,153,0.15)] scale-[1.01]'
+                ? 'border-accent shadow-[0_0_12px_rgba(196,160,56,0.15)] scale-[1.01]'
                 : 'border-border hover:border-accent'
             }`}
           >
@@ -334,6 +347,7 @@ export function ScaleTrainerScreen() {
         reading={reading}
         chartPoints={chartPoints}
         feedback={feedback}
+        targetCents={targetCents}
         fluteKey={settings.fluteKey}
         baseOctave={settings.baseOctave}
         showHints={feedback.type === 'wrong' || feedback.type === 'register'}

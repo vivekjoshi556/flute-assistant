@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { LESSONS, MODULES } from '../music/lessons'
+import { getExercisesByLesson } from '../music/lessonExercises'
 
 export function useLessonProgress() {
   const [progress, setProgress] = useState<Record<string, { completed: boolean; quizScore?: number }>>(() => {
@@ -43,7 +44,7 @@ export function LessonsScreen() {
 
   return (
     <Layout title="Learn" backTo="/">
-      <div className="max-w-4xl mx-auto p-4 space-y-6 pb-24">
+      <div className="space-y-6 pb-24">
         {MODULES.sort((a, b) => a.order - b.order).map(mod => {
           const stats = moduleStats[mod.id]
           const isExpanded = expandedModules.has(mod.id)
@@ -86,6 +87,7 @@ export function LessonsScreen() {
                 <div className="divide-y divide-border border-t border-border">
                   {lessons.map(lesson => {
                     const isCompleted = progress[lesson.id]?.completed
+                    const exerciseCount = getExercisesByLesson(lesson.id).length
                     return (
                       <button
                         key={lesson.id}
@@ -117,6 +119,7 @@ export function LessonsScreen() {
                             ) : (
                               <span className="text-xs font-medium text-text-muted">
                                 {lesson.sections.length} sections • {lesson.quiz.length} questions
+                                {exerciseCount > 0 && ` • ${exerciseCount} exercises`}
                               </span>
                             )}
                           </div>

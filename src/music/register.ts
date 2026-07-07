@@ -1,4 +1,6 @@
-import type { IndianNote } from '../types'
+import type { FluteKey, IndianNote } from '../types'
+import { getNoteFrequency } from './notes'
+import type { SwarVariant } from './noteVariants'
 
 export type Register = 'lower' | 'middle' | 'higher'
 
@@ -82,8 +84,55 @@ export function getRegisterFeedback(
 export interface NoteTarget {
   note: IndianNote
   octave: number
+  variant?: SwarVariant
+}
+
+export function getTargetFrequency(target: NoteTarget, fluteKey: FluteKey): number {
+  const base = getNoteFrequency(target.note, fluteKey, target.octave)
+  if (target.variant === 'komal') return base * Math.pow(2, -1 / 12)
+  if (target.variant === 'teevra') return base * Math.pow(2, 1 / 12)
+  return base
 }
 
 export function noteTargetLabel(target: NoteTarget, baseOctave = 5): string {
-  return target.octave > baseOctave && target.note === 'SA' ? 'SA↑' : target.note
+  if (target.variant === 'komal') {
+    return target.note.charAt(0) + target.note.slice(1).toLowerCase()
+  }
+  if (target.variant === 'teevra') return 'Ma↑'
+  if (target.octave > baseOctave && target.note === 'SA') return 'SA↑'
+  if (target.octave < baseOctave && target.note === 'SA') return 'SA↓'
+  return target.note
+}
+
+/** How closely a played frequency matches a target note, octave, and variant. */
+export function matchToTarget(
+  frequency: number,
+  detectedNote: IndianNote | null,
+  detectedOctave: number,
+  target: NoteTarget,
+  fluteKey: FluteKey,
+): { matches: boolean; centsOff: number } {
+  if (frequency <= 0) {
+    return { matches: false, centsOff: 999 }
+  }
+
+  const expected = getTargetFrequency(target, fluteKey)
+  const cents = Math.abs(1200 * Math.log2(frequency / expected))
+
+  if (target.variant && target.variant !== 'shuddha') {
+    return { matches: cents <= 40, centsOff: cents }
+  }
+
+  if (detectedNote === target.note) {
+    if (detectedOctave > 0 && detectedOctave !== target.octave) {
+      return { matches: false, centsOff: cents }
+    }
+    return { matches: cents <= 40, centsOff: cents }
+  }
+
+  const freqMatches = cents <= 40
+  const noteMatches =
+    detectedNote === target.note &&
+    (detectedOctave <= 0 || detectedOctave === target.octave)
+  return { matches: noteMatches || freqMatches, centsOff: cents }
 }

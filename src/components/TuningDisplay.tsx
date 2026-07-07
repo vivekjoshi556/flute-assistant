@@ -2,29 +2,25 @@ import { useMemo } from 'react'
 import type { PitchReading } from '../types'
 import type { IndianNote } from '../types'
 
-export function TuningMeter({ cents }: { cents: number }) {
+export function TuningMeter({ cents, dimmed = false }: { cents: number; dimmed?: boolean }) {
   const clampedCents = Math.max(-50, Math.min(50, cents))
   const position = ((clampedCents + 50) / 100) * 100
 
   const color = useMemo(() => {
+    if (dimmed) return 'bg-text-muted/20'
     const abs = Math.abs(cents)
     if (abs <= 10) return 'bg-accent'
     if (abs <= 25) return 'bg-warning'
     return 'bg-danger'
-  }, [cents])
+  }, [cents, dimmed])
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <div className="flex justify-between text-xs text-text-muted mb-2 px-1">
-        <span>Too Low</span>
-        <span>Perfect</span>
-        <span>Too High</span>
-      </div>
-      <div className="relative h-3 bg-surface-overlay rounded-full overflow-hidden">
-        <div className="absolute inset-y-0 left-1/2 w-px bg-accent/40 -translate-x-1/2" />
+    <div className={`w-full max-w-md mx-auto transition-opacity ${dimmed ? 'opacity-40' : 'opacity-100'}`}>
+      <div className="relative h-2.5 rounded-full bg-surface-overlay/80">
+        <div className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-text-muted/25" />
         <div
-          className={`absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full needle-transition ${color} shadow-lg`}
-          style={{ left: `calc(${position}% - 6px)` }}
+          className={`absolute top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full needle-transition ${color}`}
+          style={{ left: `calc(${position}% - 5px)` }}
         />
       </div>
     </div>
@@ -97,12 +93,12 @@ export function PitchGraph({ history }: { history: number[] }) {
         y1={height / 2}
         x2={width}
         y2={height / 2}
-        stroke="#34d399"
-        strokeOpacity="0.2"
+        stroke="#c4a038"
+        strokeOpacity="0.15"
         strokeWidth="1"
       />
       {path && (
-        <path d={path} fill="none" stroke="#34d399" strokeWidth="2" opacity="0.8" />
+        <path d={path} fill="none" stroke="#c4a038" strokeWidth="2" opacity="0.7" />
       )}
     </svg>
   )

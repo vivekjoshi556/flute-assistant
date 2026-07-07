@@ -4,7 +4,7 @@ import { foldToFundamental, frequencyToIndianNote } from '../music/notes'
 import { getWorkletUrl } from '../audio/pitchEngine'
 
 const HISTORY_SIZE = 150
-const SMOOTHING_ALPHA = 0.15
+const SMOOTHING_ALPHA = 0.20
 const CONFIDENCE_THRESHOLD = 0.65
 const VOLUME_GATE = 0.015
 const PLAYING_ON_FRAMES = 3

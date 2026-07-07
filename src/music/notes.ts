@@ -1,6 +1,5 @@
 import type { FluteKey, IndianNote } from '../types'
 import { INDIAN_NOTES } from '../types'
-import type { NoteTarget } from './register'
 
 const NOTE_SEMITONES: Record<string, number> = {
   C: 0, 'C#': 1, D: 2, 'D#': 3, E: 4, F: 5,
@@ -135,33 +134,3 @@ export function formatCents(cents: number): string {
   return `${sign}${cents} cents`
 }
 
-/** How closely a played frequency matches a target note and octave. */
-export function matchToTarget(
-  frequency: number,
-  detectedNote: IndianNote | null,
-  detectedOctave: number,
-  target: NoteTarget,
-  fluteKey: FluteKey,
-): { matches: boolean; centsOff: number } {
-  if (detectedNote === target.note && frequency > 0) {
-    // Note name matches — also verify octave when known
-    if (detectedOctave > 0 && detectedOctave !== target.octave) {
-      return { matches: false, centsOff: 0 }
-    }
-    return { matches: true, centsOff: 0 }
-  }
-
-  if (frequency <= 0) {
-    return { matches: false, centsOff: 999 }
-  }
-
-  // Frequency fallback: compare against target's specific octave only
-  const expected = getNoteFrequency(target.note, fluteKey, target.octave)
-  const cents = Math.abs(1200 * Math.log2(frequency / expected))
-
-  const freqMatches = cents <= 40
-  const noteMatches =
-    detectedNote === target.note &&
-    (detectedOctave <= 0 || detectedOctave === target.octave)
-  return { matches: noteMatches || freqMatches, centsOff: cents }
-}

@@ -157,12 +157,12 @@ export function PitchTraceChart({
         >
           <defs>
             <linearGradient id="actualGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#34d399" stopOpacity="0.25" />
-              <stop offset="100%" stopColor="#34d399" stopOpacity="0" />
+              <stop offset="0%" stopColor="#c4a038" stopOpacity="0.22" />
+              <stop offset="100%" stopColor="#c4a038" stopOpacity="0" />
             </linearGradient>
             <linearGradient id="expectedGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#94a3b8" stopOpacity="0.12" />
-              <stop offset="100%" stopColor="#94a3b8" stopOpacity="0" />
+              <stop offset="0%" stopColor="#7a7060" stopOpacity="0.12" />
+              <stop offset="100%" stopColor="#7a7060" stopOpacity="0" />
             </linearGradient>
           </defs>
 
@@ -170,7 +170,7 @@ export function PitchTraceChart({
           <text
             x={10}
             y={padding.top + chartH / 2}
-            fill="#64748b"
+            fill="#8a8070"
             fontSize="9"
             transform={`rotate(-90, 10, ${padding.top + chartH / 2})`}
             textAnchor="middle"
@@ -186,7 +186,7 @@ export function PitchTraceChart({
                 y1={chart.toY(tick)}
                 x2={width - padding.right}
                 y2={chart.toY(tick)}
-                stroke="#2e3a4a"
+                stroke="#38342a"
                 strokeWidth="1"
                 strokeDasharray="4 6"
               />
@@ -194,7 +194,7 @@ export function PitchTraceChart({
                 x={padding.left - 8}
                 y={chart.toY(tick) + 3}
                 textAnchor="end"
-                fill="#64748b"
+                fill="#8a8070"
                 fontSize="10"
                 fontFamily="ui-monospace, monospace"
               >
@@ -216,7 +216,7 @@ export function PitchTraceChart({
             <path
               d={chart.expectedPath}
               fill="none"
-              stroke="#94a3b8"
+              stroke="#7a7060"
               strokeWidth="2"
               strokeDasharray="8 5"
               strokeLinecap="round"
@@ -229,7 +229,7 @@ export function PitchTraceChart({
             <path
               d={chart.actualPath}
               fill="none"
-              stroke="#34d399"
+              stroke="#c4a038"
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -243,12 +243,12 @@ export function PitchTraceChart({
                 cx={chart.endX}
                 cy={chart.endExpectedY}
                 r="4"
-                fill="#94a3b8"
+                fill="#7a7060"
               />
               <text
                 x={chart.endX + 6}
                 y={chart.endExpectedY + 3}
-                fill="#94a3b8"
+                fill="#7a7060"
                 fontSize="9"
                 fontWeight="600"
               >
@@ -262,12 +262,12 @@ export function PitchTraceChart({
                 cx={chart.endX}
                 cy={chart.endActualY}
                 r="4.5"
-                fill="#34d399"
+                fill="#c4a038"
               />
               <text
                 x={chart.endX + 6}
                 y={chart.endActualY + 3}
-                fill="#34d399"
+                fill="#c4a038"
                 fontSize="9"
                 fontWeight="600"
               >
@@ -282,7 +282,7 @@ export function PitchTraceChart({
               x={width / 2}
               y={padding.top + chartH / 2}
               textAnchor="middle"
-              fill="#64748b"
+              fill="#8a8070"
               fontSize="11"
             >
               Chart fills as you play…

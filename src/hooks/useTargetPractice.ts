@@ -1,15 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { FluteKey, NoteResult, PracticeSession } from '../types'
 import type { NoteTarget } from '../music/register'
-import {
-  getNoteFrequency,
-  matchToTarget,
-  noteDistance,
-  centsToTuningLabel,
-} from '../music/notes'
+import { matchToTarget, getTargetFrequency, noteTargetLabel } from '../music/register'
+import { noteDistance, centsToTuningLabel } from '../music/notes'
 import { usePitchDetection } from './usePitchDetection'
 import { usePitchChart } from './usePitchChart'
-import { useStableFeedback } from './useStableFeedback'
+import { usePracticeFeedback } from './usePracticeFeedback'
 import type { FeedbackState } from '../components/PracticeLayout'
 
 const CENTS_TOLERANCE = 35
@@ -51,12 +47,10 @@ export function useTargetPractice({
   const { reading, error } = usePitchDetection(fluteKey, micOn)
   const target = targets[currentIndex] ?? null
   const expectedFrequency = target
-    ? getNoteFrequency(target.note, fluteKey, target.octave)
+    ? getTargetFrequency(target, fluteKey)
     : null
 
-  const targetLabel = target
-    ? `${target.note}${target.octave > targets[0]?.octave && target.note === 'SA' ? '↑' : ''}`
-    : null
+  const targetLabel = target ? noteTargetLabel(target, targets[0]?.octave ?? 5) : null
 
   const { points: chartPoints, clear: clearChart } = usePitchChart(
     reading.frequency,
@@ -89,34 +83,46 @@ export function useTargetPractice({
 
 
 
+  const targetCents = useMemo(() => {
+    if (!target || !reading.isPlaying || reading.frequency <= 0) return 0
+    const expected = getTargetFrequency(target, fluteKey)
+    return Math.round(1200 * Math.log2(reading.frequency / expected))
+  }, [target, reading.frequency, reading.isPlaying, fluteKey])
+
   const isNoteClose = useCallback(() => {
     if (!isTargetMatch()) return false
-    return Math.abs(reading.cents) > CENTS_TOLERANCE
-  }, [isTargetMatch, reading.cents])
+    return Math.abs(targetCents) > CENTS_TOLERANCE
+  }, [isTargetMatch, targetCents])
 
   const rawFeedback: FeedbackState = useMemo(() => {
-    if (phase === 'play' && target && reading.isPlaying && reading.note) {
+    if (
+      phase === 'play' &&
+      target &&
+      reading.isPlaying &&
+      reading.note &&
+      reading.confidence >= CONFIDENCE_THRESHOLD
+    ) {
       if (!isTargetMatch()) {
         return {
           type: 'wrong',
-          expected: target.note,
-          detected: reading.note,
+          expectedLabel: noteTargetLabel(target, targets[0]?.octave ?? 5),
+          detectedLabel: reading.note,
           distance: noteDistance(target.note, reading.note),
         }
       }
       if (isNoteClose()) {
         return {
           type: 'close',
-          cents: reading.cents,
-          label: `${centsToTuningLabel(reading.cents)} (${reading.cents > 0 ? '+' : ''}${reading.cents} cents)`,
+          cents: targetCents,
+          label: `${centsToTuningLabel(targetCents)} (${targetCents > 0 ? '+' : ''}${targetCents} cents)`,
         }
       }
     }
 
     return { type: 'idle' }
-  }, [phase, target, reading, isTargetMatch, isNoteClose])
+  }, [phase, target, targets, reading, isTargetMatch, isNoteClose, targetCents])
 
-  const feedback = useStableFeedback(rawFeedback)
+  const feedback = usePracticeFeedback(rawFeedback)
 
   const showHints =
     phase === 'play' &&
@@ -146,13 +152,17 @@ export function useTargetPractice({
       if (!r.isPlaying || r.confidence < CONFIDENCE_THRESHOLD) return
 
       const { matches } = matchToTarget(r.frequency, r.note, r.octave, target, fluteKey)
-      if (matches && Math.abs(r.cents) <= CENTS_TOLERANCE) {
+      const expected = getTargetFrequency(target, fluteKey)
+      const centsOff = r.frequency > 0
+        ? Math.abs(1200 * Math.log2(r.frequency / expected))
+        : 999
+      if (matches && centsOff <= CENTS_TOLERANCE) {
         // Matching reading — accumulate confirmation
         if (confirmCountRef.current === 0) {
           firstMatchTimeRef.current = Date.now()
         }
         confirmCountRef.current += 1
-        pendingCentsRef.current.push(Math.abs(r.cents))
+        pendingCentsRef.current.push(centsOff)
 
         if (confirmCountRef.current >= CONFIRM_POLLS) {
           // Confirmed — compute accuracy from averaged cents over the window
@@ -242,6 +252,7 @@ export function useTargetPractice({
     start,
     finishEarly,
     buildSession,
+    targetCents,
     noteResults: noteResultsRef.current,
   }
 }

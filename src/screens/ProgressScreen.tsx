@@ -63,7 +63,8 @@ export function ProgressScreen() {
           </h3>
           <div className="space-y-3">
             {Object.entries(accuracyByNote)
-              .sort(([a], [b]) => a.localeCompare(b))
+              // .sort(([a], [b]) => a.localeCompare(b))
+              .sort(([, a], [, b]) => a - b)
               .map(([note, accuracy]) => (
                 <div key={note} className="flex items-center gap-3">
                   <span className="w-10 font-bold text-sm">{note}</span>
