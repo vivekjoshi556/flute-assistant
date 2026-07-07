@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, type ReactNode } from 'react'
 import type { PitchReading } from '../types'
 import type { NoteTarget } from '../music/register'
 import { noteTargetLabel, getTargetFrequency } from '../music/register'

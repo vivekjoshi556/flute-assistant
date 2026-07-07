@@ -56,7 +56,7 @@ export function NoteWheel({ detectedNote, targetNote }: NoteWheelProps) {
           strokeWidth="0.5"
         />
 
-        {INDIAN_NOTES.map((note, i) => {
+        {INDIAN_NOTES.map((note) => {
           const pos = WHEEL_POSITIONS[note]
           const isDetected = detectedNote === note
           const isTarget = targetNote === note
