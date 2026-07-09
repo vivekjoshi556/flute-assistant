@@ -29,6 +29,8 @@ export interface NoteResult {
   detectedNote: IndianNote | null
   accuracy: number
   durationHeld: number
+  /** MIDI octave of the expected note (e.g. 5 for middle octave, 6 for upper). */
+  octave?: number
 }
 
 export interface PracticeSession {

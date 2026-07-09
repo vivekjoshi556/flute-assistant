@@ -185,6 +185,7 @@ export function ScaleTrainerScreen() {
               detectedNote: r.note,
               accuracy,
               durationHeld: 0.5,
+              octave: target.octave,
             })
             confirmCountRef.current = 0
             pendingCentsRef.current = []

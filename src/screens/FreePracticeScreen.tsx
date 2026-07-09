@@ -49,6 +49,7 @@ export function FreePracticeScreen() {
         detectedNote: reading.note,
         accuracy,
         durationHeld: 0.3,
+        octave: reading.octave,
       })
     }
   }, [reading])

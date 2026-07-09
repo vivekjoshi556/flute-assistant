@@ -179,6 +179,7 @@ export function useTargetPractice({
             detectedNote: r.note,
             accuracy,
             durationHeld: Math.max(0.4, holdDuration),
+            octave: target.octave,
           })
 
           // Reset confirmation state for the next note
