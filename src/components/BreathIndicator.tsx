@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import type { BreathDetectionState } from '../hooks/useBreathDetection'
 
 function fmt(ms: number): string {
