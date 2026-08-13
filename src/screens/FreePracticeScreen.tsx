@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { usePitchDetection } from '../hooks/usePitchDetection'
 import { usePitchChart } from '../hooks/usePitchChart'
+import { useBreathDetection } from '../hooks/useBreathDetection'
 import { Layout } from '../components/Layout'
 import { NoteDisplay, StabilityBar, BreathQualityIndicator } from '../components/TuningDisplay'
 import { DetectionPanel } from '../components/DetectionPanel'
 import { NoteWheel } from '../components/NoteWheel'
 import { PitchTraceChart } from '../components/PitchTraceChart'
 import { RegisterIndicator } from '../components/RegisterIndicator'
+import { BreathIndicator } from '../components/BreathIndicator'
 import { formatCents, formatFrequency } from '../music/notes'
 import { getTuningColorClass } from '../components/TuningDisplay'
 import type { NoteResult, PracticeSession } from '../types'
@@ -24,6 +26,8 @@ export function FreePracticeScreen() {
     settings.fluteKey,
     micOn,
   )
+
+  const breath = useBreathDetection(reading.isPlaying)
 
   const { points: chartPoints } = usePitchChart(
     reading.frequency,
@@ -77,6 +81,7 @@ export function FreePracticeScreen() {
     }
     setActiveSession(session)
     setMicOn(false)
+    breath.reset()
     navigate('/session-summary')
   }
 
@@ -110,12 +115,22 @@ export function FreePracticeScreen() {
 
         <RegisterIndicator detectedOctave={reading.octave} baseOctave={settings.baseOctave} />
 
-        <div className="text-center space-y-2 min-h-[72px]">
-          <p className="text-sm text-text-muted">Pitch Stability</p>
-          <p className="text-2xl font-bold text-accent">
-            {reading.isPlaying && reading.stability > 0 ? `${reading.stability}%` : '—'}
-          </p>
-          <StabilityBar stability={reading.isPlaying ? reading.stability : 0} />
+        <div className="grid grid-cols-2 gap-3 min-h-[220px]">
+          {/* Pitch Stability Card */}
+          <div className="flex flex-col items-center justify-between p-4 h-full bg-surface-overlay/10 backdrop-blur-md rounded-[2rem] border border-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.12)]">
+            <h3 className="text-[10px] text-text-muted uppercase tracking-widest mb-2">Pitch Stability</h3>
+            <div className="flex items-center justify-center flex-1">
+              <span className="text-4xl font-mono font-bold tracking-tighter text-accent drop-shadow-[0_0_12px_rgba(56,189,248,0.4)]">
+                {reading.isPlaying && reading.stability > 0 ? `${reading.stability}%` : '—'}
+              </span>
+            </div>
+            <div className="w-full mt-2">
+              <StabilityBar stability={reading.isPlaying ? reading.stability : 0} />
+            </div>
+          </div>
+          
+          {/* Breath Hold Clock */}
+          <BreathIndicator breath={breath} />
         </div>
 
         <BreathQualityIndicator reading={reading} />
