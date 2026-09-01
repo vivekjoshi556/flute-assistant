@@ -11,7 +11,7 @@ export interface YinResult {
 
 const YIN_THRESHOLD = 0.15
 const MIN_FREQ = 80
-const MAX_FREQ = 1200
+const MAX_FREQ = 2400
 
 export function detectPitchYIN(
   buffer: Float32Array,

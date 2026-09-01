@@ -53,13 +53,15 @@ export interface DetectedNoteInfo {
 
 /**
  * Flute pitch detectors often lock onto harmonics (2× the true pitch).
- * Fold the frequency into the beginner bansuri range before note mapping.
+ * Fold the frequency into the bansuri range (octave 3 to octave 6) before
+ * note mapping. This covers lower (mandra), middle (madhya) and higher
+ * (taar) saptaks.
  */
 export function foldToFundamental(frequency: number, fluteKey: FluteKey): number {
   if (frequency <= 0) return 0
 
   const lowSa = getSaFrequency(fluteKey, 3)
-  const highNi = getNoteFrequency('NI', fluteKey, 5)
+  const highNi = getNoteFrequency('NI', fluteKey, 6)
   let f = frequency
 
   while (f > highNi * 1.15 && f / 2 >= lowSa * 0.85) {
@@ -73,7 +75,7 @@ export function foldToFundamental(frequency: number, fluteKey: FluteKey): number
 }
 
 /**
- * Map frequency → Indian note by searching octaves 3–5 and picking
+ * Map frequency → Indian note by searching octaves 3–6 and picking
  * the closest match in cents (avoids wrapping bugs in the old algorithm).
  */
 export function frequencyToIndianNote(
@@ -81,13 +83,13 @@ export function frequencyToIndianNote(
   fluteKey: FluteKey,
 ): DetectedNoteInfo | null {
   const folded = foldToFundamental(frequency, fluteKey)
-  if (folded < 80 || folded > 2000) return null
+  if (folded < 80 || folded > 4000) return null
 
   const midi = frequencyToMidi(folded)
   let best: DetectedNoteInfo | null = null
   let bestAbsCents = Infinity
 
-  for (let octave = 3; octave <= 5; octave++) {
+  for (let octave = 3; octave <= 6; octave++) {
     const saMidi = getSaMidiNote(fluteKey, octave)
     for (const [note, offset] of Object.entries(NOTE_OFFSETS) as [IndianNote, number][]) {
       const targetMidi = saMidi + offset

@@ -12,7 +12,7 @@ class PitchProcessor extends AudioWorkletProcessor {
   yin(buffer, sampleRate) {
     const YIN_THRESHOLD = 0.15
     const MIN_FREQ = 80
-    const MAX_FREQ = 1200
+    const MAX_FREQ = 2400
     const bufferSize = buffer.length
     const halfSize = Math.floor(bufferSize / 2)
     if (halfSize < 2) return { frequency: 0, confidence: 0, volume: 0 }
