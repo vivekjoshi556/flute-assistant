@@ -1,5 +1,7 @@
 // ─── Lesson Exercises — playable practice tied to each lesson ────────────────
 
+export type EvaluationMode = 'standard' | 'long-tone' | 'ornament' | 'rhythm' | 'glide' | 'stability'
+
 export interface PracticeExercise {
   id: string
   lessonId: string
@@ -8,6 +10,20 @@ export interface PracticeExercise {
   notes: string[]
   successMessage: string
   estimatedMinutes: number
+  /** Minimum duration in seconds to hold each note before advancing (for long-tone practice) */
+  minHoldDuration?: number
+  /** Pitch tolerance in cents (default 35 for most exercises, tighter for komal swars) */
+  toleranceCents?: number
+  /** Evaluation mode affects how the practice engine evaluates the exercise */
+  evaluationMode?: EvaluationMode
+  /** For rhythm mode: BPM to use for metronome sync */
+  targetBpm?: number
+  /** For stability mode: pitch stability threshold (0-100) */
+  stabilityThreshold?: number
+  /** Polling interval in milliseconds (default 400, faster for ornaments) */
+  pollInterval?: number
+  /** Number of consecutive matching polls required (default 2, fewer for ornaments) */
+  confirmPolls?: number
 }
 
 export const LESSON_EXERCISES: PracticeExercise[] = [
@@ -97,16 +113,48 @@ export const LESSON_EXERCISES: PracticeExercise[] = [
     notes: ['SA', 're', 'RE', 're', 'SA'],
     successMessage: 'Komal Re is taking shape! That half-hole technique gets easier with daily practice.',
     estimatedMinutes: 6,
+    toleranceCents: 25,
+    evaluationMode: 'stability',
+    stabilityThreshold: 70,
   },
   {
     id: 'komal-ga-drill',
     lessonId: 'komal-swar',
     title: 'Komal Ga — Half-Hole',
     description:
-      'Practice the komal Ga using partial finger coverage. Compare it to shuddha Ga — feel the softer, darker colour of the komal form.',
+      'Practice the komal Ga using partial finger coverage. Compare it to shuddha Ga — feel the softer, darker color of the komal form.',
     notes: ['RE', 'ga', 'GA', 'ga', 'RE'],
     successMessage: 'Komal Ga has a distinct mood — you can hear the difference now.',
     estimatedMinutes: 6,
+    toleranceCents: 25,
+    evaluationMode: 'stability',
+    stabilityThreshold: 70,
+  },
+  {
+    id: 'komal-dha-drill',
+    lessonId: 'komal-swar',
+    title: 'Komal Dha — Half-Hole',
+    description:
+      'Practice komal Dha using partial finger coverage. This note appears in Bhairavi, Asavari, and Darbari — precise half-hole control is essential.',
+    notes: ['PA', 'dha', 'DHA', 'dha', 'PA'],
+    successMessage: 'Komal Dha is one of the most challenging komal notes — you\'re building real control.',
+    estimatedMinutes: 6,
+    toleranceCents: 25,
+    evaluationMode: 'stability',
+    stabilityThreshold: 70,
+  },
+  {
+    id: 'komal-ni-drill',
+    lessonId: 'komal-swar',
+    title: 'Komal Ni — Half-Hole',
+    description:
+      'Practice komal Ni using partial finger coverage. This delicate note appears in Khamaj, Kafi, and Asavari — steady embouchure is key.',
+    notes: ['DHA', 'ni', 'NI', 'ni', 'DHA'],
+    successMessage: 'Komal Ni requires subtle finger pressure — you\'re developing the sensitivity needed.',
+    estimatedMinutes: 6,
+    toleranceCents: 25,
+    evaluationMode: 'stability',
+    stabilityThreshold: 70,
   },
   {
     id: 'komal-bhairavi-snippet',
@@ -115,8 +163,105 @@ export const LESSON_EXERCISES: PracticeExercise[] = [
     description:
       'Play a short Bhairavi thaat phrase with all four komal swaras. Use half-hole technique for re, ga, dha, and ni.',
     notes: ['SA', 're', 'ga', 'MA', 'PA', 'dha', 'ni', 'SA↑'],
-    successMessage: 'That Bhairavi colour is unmistakable — deep and devotional.',
+    successMessage: 'That Bhairavi color is unmistakable — deep and devotional.',
     estimatedMinutes: 8,
+    toleranceCents: 30,
+  },
+  {
+    id: 'komal-isolated-re',
+    lessonId: 'komal-swar',
+    title: 'Komal Re — Long Tone Calibration',
+    description:
+      'Hold komal Re for 8+ seconds to calibrate your half-hole technique. Focus on unwavering pitch and steady breath.',
+    notes: ['re'],
+    successMessage: 'Your komal Re half-hole is stabilizing — this foundation is crucial.',
+    estimatedMinutes: 5,
+    minHoldDuration: 8,
+    toleranceCents: 25,
+    evaluationMode: 'long-tone',
+  },
+  {
+    id: 'komal-isolated-ga',
+    lessonId: 'komal-swar',
+    title: 'Komal Ga — Long Tone Calibration',
+    description:
+      'Hold komal Ga for 8+ seconds to calibrate your half-hole technique. The finger must be placed precisely and consistently.',
+    notes: ['ga'],
+    successMessage: 'Komal Ga stability is improving — keep working on that subtle finger placement.',
+    estimatedMinutes: 5,
+    minHoldDuration: 8,
+    toleranceCents: 25,
+    evaluationMode: 'long-tone',
+  },
+  {
+    id: 'komal-isolated-dha',
+    lessonId: 'komal-swar',
+    title: 'Komal Dha — Long Tone Calibration',
+    description:
+      'Hold komal Dha for 8+ seconds. This is often the most difficult komal note due to finger positioning.',
+    notes: ['dha'],
+    successMessage: 'Komal Dha long tones are challenging — you\'re building serious technique.',
+    estimatedMinutes: 5,
+    minHoldDuration: 8,
+    toleranceCents: 25,
+    evaluationMode: 'long-tone',
+  },
+  {
+    id: 'komal-isolated-ni',
+    lessonId: 'komal-swar',
+    title: 'Komal Ni — Long Tone Calibration',
+    description:
+      'Hold komal Ni for 8+ seconds. The upper-register komal requires both finger control and breath support.',
+    notes: ['ni'],
+    successMessage: 'Komal Ni long tones demand finesse — your control is developing.',
+    estimatedMinutes: 5,
+    minHoldDuration: 8,
+    toleranceCents: 25,
+    evaluationMode: 'long-tone',
+  },
+  {
+    id: 'komal-comparison-re',
+    lessonId: 'komal-swar',
+    title: 'Komal vs Shuddha Re Comparison',
+    description:
+      'Alternate between komal Re and shuddha Re to hear and feel the microtonal difference. Develop muscle memory for both positions.',
+    notes: ['re', 'RE', 're', 'RE', 're', 'RE', 'SA'],
+    successMessage: 'You can now distinguish between komal and shuddha Re — a critical skill.',
+    estimatedMinutes: 6,
+    toleranceCents: 25,
+  },
+  {
+    id: 'komal-comparison-ga',
+    lessonId: 'komal-swar',
+    title: 'Komal vs Shuddha Ga Comparison',
+    description:
+      'Alternate between komal Ga and shuddha Ga. The semitone difference creates entirely different moods in raags.',
+    notes: ['ga', 'GA', 'ga', 'GA', 'ga', 'GA', 'RE'],
+    successMessage: 'The komal/shuddha Ga distinction is becoming instinctive.',
+    estimatedMinutes: 6,
+    toleranceCents: 25,
+  },
+  {
+    id: 'komal-interval-sa',
+    lessonId: 'komal-swar',
+    title: 'Sa to Komal Swars Intervals',
+    description:
+      'Jump from Sa to each komal note directly. This tests your ability to land precisely on half-hole positions from distance.',
+    notes: ['SA', 're', 'SA', 'ga', 'SA', 'dha', 'SA', 'ni', 'SA'],
+    successMessage: 'Direct jumps to komal notes require quick, precise finger adjustments.',
+    estimatedMinutes: 7,
+    toleranceCents: 30,
+  },
+  {
+    id: 'komal-interval-pa',
+    lessonId: 'komal-swar',
+    title: 'Pa to Komal Swars Intervals',
+    description:
+      'Jump from Pa to each komal note. These intervals appear constantly in raag phrases — master them for fluid playing.',
+    notes: ['PA', 're', 'PA', 'ga', 'PA', 'dha', 'PA', 'ni', 'PA'],
+    successMessage: 'Pa-to-komal intervals are foundational — excellent work.',
+    estimatedMinutes: 7,
+    toleranceCents: 30,
   },
 
   // ── teevra-swar ──
@@ -182,7 +327,7 @@ export const LESSON_EXERCISES: PracticeExercise[] = [
     id: 'thaat-bhairav',
     lessonId: 'thaat-system',
     title: 'Bhairav Thaat',
-    description: 'Bhairav thaat uses komal Re and komal Dha with all other swaras shuddha. Its solemn, majestic colour is associated with early morning.',
+    description: 'Bhairav thaat uses komal Re and komal Dha with all other swaras shuddha. Its solemn, majestic color is associated with early morning.',
     notes: ['SA', 're', 'GA', 'MA', 'PA', 'dha', 'NI', 'SA↑', 'NI', 'dha', 'PA', 'MA', 'GA', 're', 'SA'],
     successMessage: 'Bhairav thaat — grave and majestic, like the breaking of dawn.',
     estimatedMinutes: 8,
@@ -292,6 +437,8 @@ export const LESSON_EXERCISES: PracticeExercise[] = [
     notes: ['SA', 'SA', 'SA', 'SA'],
     successMessage: 'You felt the sam! Rhythm starts with internalizing this pulse.',
     estimatedMinutes: 5,
+    evaluationMode: 'rhythm',
+    targetBpm: 60,
   },
   {
     id: 'taal-sargam-cycle',
@@ -302,6 +449,8 @@ export const LESSON_EXERCISES: PracticeExercise[] = [
     notes: ['SA', 'RE', 'GA', 'MA', 'PA', 'DHA', 'NI', 'SA↑', 'NI', 'DHA', 'PA', 'MA', 'GA', 'RE', 'SA', 'SA'],
     successMessage: 'Sargam locked to rhythm — a crucial skill for performance.',
     estimatedMinutes: 7,
+    evaluationMode: 'rhythm',
+    targetBpm: 60,
   },
 
   // ── laya-tempo ──
@@ -314,6 +463,8 @@ export const LESSON_EXERCISES: PracticeExercise[] = [
     notes: ['SA', 'RE', 'GA', 'MA', 'PA', 'DHA', 'NI'],
     successMessage: 'Steady long tones build the breath foundation for everything else.',
     estimatedMinutes: 6,
+    minHoldDuration: 8,
+    evaluationMode: 'long-tone',
   },
   {
     id: 'laya-speed-ladder',
@@ -376,6 +527,7 @@ export const LESSON_EXERCISES: PracticeExercise[] = [
     notes: ['SA', 'RE', 'GA', 'MA', 'PA', 'DHA', 'NI'],
     successMessage: 'Adjacent meends are the building blocks of bansuri expression.',
     estimatedMinutes: 7,
+    evaluationMode: 'glide',
   },
   {
     id: 'meend-kan-swar',
@@ -386,6 +538,91 @@ export const LESSON_EXERCISES: PracticeExercise[] = [
     notes: ['RE', 'GA', 'GA', 'MA', 'RE', 'GA', 'GA', 'MA', 'MA', 'PA'],
     successMessage: 'Grace notes add sparkle — keep them light and fleeting.',
     estimatedMinutes: 6,
+    evaluationMode: 'ornament',
+    minHoldDuration: 0.15,
+    pollInterval: 100,
+    confirmPolls: 1,
+  },
+  {
+    id: 'khatka-basic',
+    lessonId: 'meend-gamak',
+    title: 'Khatka — Rapid Turn',
+    description:
+      'Practice a basic khatka around Sa: Re-Sa-Ni-Sa. The turn should be crisp, rhythmic, and energetic.',
+    notes: ['RE', 'SA', 'NI', 'SA'],
+    successMessage: 'Khatka requires crisp finger work — your turns are getting sharper.',
+    estimatedMinutes: 5,
+    evaluationMode: 'ornament',
+    minHoldDuration: 0.12,
+    pollInterval: 100,
+    confirmPolls: 1,
+  },
+  {
+    id: 'khatka-pa',
+    lessonId: 'meend-gamak',
+    title: 'Khatka around Pa',
+    description:
+      'Khatka centered on Pa: Dha-Pa-Ma-Pa. Practice this rapid turn which appears in many raag phrases.',
+    notes: ['DHA', 'PA', 'MA', 'PA'],
+    successMessage: 'Pa-centered khatkas add rhythmic excitement to phrases.',
+    estimatedMinutes: 5,
+    evaluationMode: 'ornament',
+    minHoldDuration: 0.12,
+    pollInterval: 100,
+    confirmPolls: 1,
+  },
+  {
+    id: 'murki-basic',
+    lessonId: 'meend-gamak',
+    title: 'Murki — Delicate Swirl',
+    description:
+      'Practice a delicate murki: Ga-Ma-Ga-RE-Ga. Murki should feel light and decorative, not forceful.',
+    notes: ['GA', 'MA', 'GA', 'RE', 'GA'],
+    successMessage: 'Murki adds a delicate sparkle — keep it light and flowing.',
+    estimatedMinutes: 5,
+    evaluationMode: 'ornament',
+    minHoldDuration: 0.1,
+    pollInterval: 80,
+    confirmPolls: 1,
+  },
+  {
+    id: 'gamak-basic',
+    lessonId: 'meend-gamak',
+    title: 'Gamak — Heavy Oscillation',
+    description:
+      'Practice heavy oscillation between Sa and RE. Gamak requires strong diaphragmic pulse and rhythmic finger movement.',
+    notes: ['SA', 'RE', 'SA', 'RE', 'SA', 'RE', 'SA'],
+    successMessage: 'Gamak develops breath power and rhythmic control.',
+    estimatedMinutes: 6,
+    evaluationMode: 'glide',
+  },
+  {
+    id: 'andolan-ga',
+    lessonId: 'meend-gamak',
+    title: 'Andolan on Komal Ga',
+    description:
+      'Practice slow, sweeping microtonal oscillation around komal Ga — the signature movement of Raag Darbari and Todi.',
+    notes: ['ga'],
+    successMessage: 'Andolan requires subtle control — you\'re developing the delicate touch needed.',
+    estimatedMinutes: 7,
+    evaluationMode: 'stability',
+    minHoldDuration: 6,
+    toleranceCents: 20,
+    stabilityThreshold: 60,
+  },
+  {
+    id: 'andolan-dha',
+    lessonId: 'meend-gamak',
+    title: 'Andolan on Komal Dha',
+    description:
+      'Practice slow oscillation around komal Dha, another key andolan note in Darbari. Move within a narrow pitch band.',
+    notes: ['dha'],
+    successMessage: 'Komal Dha andolan is challenging — your control is impressive.',
+    estimatedMinutes: 7,
+    evaluationMode: 'stability',
+    minHoldDuration: 6,
+    toleranceCents: 20,
+    stabilityThreshold: 60,
   },
 
   // ── breath-tone ──
@@ -398,6 +635,8 @@ export const LESSON_EXERCISES: PracticeExercise[] = [
     notes: ['SA', 'RE', 'GA', 'MA', 'PA', 'DHA', 'NI', 'SA↑'],
     successMessage: 'Your breath and embouchure are strengthening with every long tone.',
     estimatedMinutes: 8,
+    minHoldDuration: 8,
+    evaluationMode: 'long-tone',
   },
   {
     id: 'breath-octave-jump',

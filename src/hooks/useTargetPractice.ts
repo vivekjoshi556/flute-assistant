@@ -8,9 +8,10 @@ import { usePitchChart } from './usePitchChart'
 import { usePracticeFeedback } from './usePracticeFeedback'
 import type { FeedbackState } from '../components/PracticeLayout'
 
-const CENTS_TOLERANCE = 35
+const DEFAULT_CENTS_TOLERANCE = 35
 const CONFIDENCE_THRESHOLD = 0.65
-const CONFIRM_POLLS = 2 // consecutive matching polls required before advancing
+const DEFAULT_CONFIRM_POLLS = 2 // consecutive matching polls required before advancing
+const DEFAULT_POLL_INTERVAL = 400 // ms
 
 export type PracticePhase = 'play' | 'done'
 
@@ -20,6 +21,20 @@ interface UseTargetPracticeOptions {
   enabled: boolean
   loop?: boolean
   onComplete?: () => void
+  /** Minimum duration in seconds to hold each note before advancing (for long-tone practice) */
+  minHoldDuration?: number
+  /** Pitch tolerance in cents (default 35) */
+  toleranceCents?: number
+  /** Number of consecutive matching polls required before advancing */
+  confirmPolls?: number
+  /** Polling interval in milliseconds */
+  pollInterval?: number
+  /** Evaluation mode for specialized behavior */
+  evaluationMode?: 'standard' | 'long-tone' | 'ornament' | 'rhythm' | 'glide' | 'stability'
+  /** For stability mode: pitch stability threshold (0-100) */
+  stabilityThreshold?: number
+  /** For rhythm mode: BPM to calculate expected timing */
+  targetBpm?: number
 }
 
 export function useTargetPractice({
@@ -28,6 +43,13 @@ export function useTargetPractice({
   enabled,
   loop = false,
   onComplete,
+  minHoldDuration,
+  toleranceCents = DEFAULT_CENTS_TOLERANCE,
+  confirmPolls = DEFAULT_CONFIRM_POLLS,
+  pollInterval = DEFAULT_POLL_INTERVAL,
+  evaluationMode = 'standard',
+  stabilityThreshold,
+  targetBpm,
 }: UseTargetPracticeOptions) {
   const [phase, setPhase] = useState<PracticePhase>('play')
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -38,11 +60,20 @@ export function useTargetPractice({
   const noteResultsRef = useRef<NoteResult[]>([])
   const [struggling, setStruggling] = useState(false)
 
-  // Consecutive-match confirmation state: require CONFIRM_POLLS consecutive
+  // Consecutive-match confirmation state: require confirmPolls consecutive
   // matching readings before advancing to filter out transient/adjacent notes.
   const confirmCountRef = useRef(0)
   const pendingCentsRef = useRef<number[]>([])
   const firstMatchTimeRef = useRef(0)
+
+  // Glide tracking: track pitch transitions for meend exercises
+  const glideTransitionHistoryRef = useRef<{ frequency: number; timestamp: number }[]>([])
+  const lastMatchedFrequencyRef = useRef(0)
+  const previousTargetFrequencyRef = useRef(0)
+
+  // Rhythm tracking: track note onset times for rhythm exercises
+  const noteOnsetTimeRef = useRef(0)
+  const expectedBeatTimeRef = useRef(0)
 
   const { reading, error } = usePitchDetection(fluteKey, micOn)
   const target = targets[currentIndex] ?? null
@@ -91,8 +122,8 @@ export function useTargetPractice({
 
   const isNoteClose = useCallback(() => {
     if (!isTargetMatch()) return false
-    return Math.abs(targetCents) > CENTS_TOLERANCE
-  }, [isTargetMatch, targetCents])
+    return Math.abs(targetCents) > toleranceCents
+  }, [isTargetMatch, targetCents, toleranceCents])
 
   const rawFeedback: FeedbackState = useMemo(() => {
     if (
@@ -139,10 +170,21 @@ export function useTargetPractice({
     confirmCountRef.current = 0
     pendingCentsRef.current = []
     firstMatchTimeRef.current = 0
-  }, [currentIndex])
+    // Store the previous target's frequency for glide analysis
+    previousTargetFrequencyRef.current = target ? getTargetFrequency(target, fluteKey) : 0
+    glideTransitionHistoryRef.current = []
+    lastMatchedFrequencyRef.current = 0
+    // For rhythm mode: calculate expected beat time for this note
+    if (evaluationMode === 'rhythm' && targetBpm) {
+      const secondsPerBeat = 60.0 / targetBpm
+      expectedBeatTimeRef.current = Date.now() / 1000 + secondsPerBeat
+    }
+    noteOnsetTimeRef.current = 0
+  }, [currentIndex, target, fluteKey, evaluationMode, targetBpm])
 
-  // Advance only after CONFIRM_POLLS consecutive matching readings.
-  // This small delay (~400ms) filters transient/adjacent note detections
+  // Advance only after confirmPolls consecutive matching readings.
+  // If minHoldDuration is specified, also require that duration to be met.
+  // This small delay filters transient/adjacent note detections
   // and allows accuracy to be averaged over the confirmation window.
   useEffect(() => {
     if (phase !== 'play' || !target) return
@@ -156,36 +198,117 @@ export function useTargetPractice({
       const centsOff = r.frequency > 0
         ? Math.abs(1200 * Math.log2(r.frequency / expected))
         : 999
-      if (matches && centsOff <= CENTS_TOLERANCE) {
+
+      // For glide mode: track pitch transitions during the entire hold phase
+      // This includes the transition from previous note to current target
+      if (evaluationMode === 'glide' && r.frequency > 0) {
+        glideTransitionHistoryRef.current.push({
+          frequency: r.frequency,
+          timestamp: Date.now(),
+        })
+        // Keep only last 3 seconds of history to cover transition + hold
+        const cutoff = Date.now() - 3000
+        glideTransitionHistoryRef.current = glideTransitionHistoryRef.current.filter(
+          (h) => h.timestamp > cutoff
+        )
+      }
+
+      if (matches && centsOff <= toleranceCents) {
         // Matching reading — accumulate confirmation
         if (confirmCountRef.current === 0) {
           firstMatchTimeRef.current = Date.now()
+          lastMatchedFrequencyRef.current = r.frequency
+          // For rhythm mode: record note onset time
+          if (evaluationMode === 'rhythm') {
+            noteOnsetTimeRef.current = Date.now() / 1000
+          }
         }
         confirmCountRef.current += 1
         pendingCentsRef.current.push(centsOff)
 
-        if (confirmCountRef.current >= CONFIRM_POLLS) {
+        const holdDuration = (Date.now() - firstMatchTimeRef.current) / 1000
+        const meetsMinHold = !minHoldDuration || holdDuration >= minHoldDuration
+
+        if (confirmCountRef.current >= confirmPolls && meetsMinHold) {
           // Confirmed — compute accuracy from averaged cents over the window
           setStruggling(false)
           const avgCents =
             pendingCentsRef.current.reduce((a, b) => a + b, 0) /
             pendingCentsRef.current.length
-          const accuracy = Math.max(0, 100 - avgCents * 2)
-          const holdDuration = (Date.now() - firstMatchTimeRef.current) / 1000
+          let accuracy = Math.max(0, 100 - avgCents * 2)
+
+          // Apply stability penalty for stability mode
+          if (evaluationMode === 'stability' && r.stability > 0 && accuracy > 0) {
+            const threshold = stabilityThreshold ?? 70
+            if (r.stability < threshold) {
+              const stabilityPenalty = ((threshold - r.stability) / threshold) * 30
+              accuracy = Math.max(0, accuracy - stabilityPenalty)
+            }
+          }
+
+          // Apply glide smoothness penalty for glide mode
+          if (evaluationMode === 'glide' && glideTransitionHistoryRef.current.length > 2) {
+            const transitions = glideTransitionHistoryRef.current
+            let maxJump = 0
+            let totalJump = 0
+            let jumpCount = 0
+
+            // Analyze frequency changes to detect discontinuous jumps vs smooth glides
+            for (let i = 1; i < transitions.length; i++) {
+              const jump = Math.abs(transitions[i].frequency - transitions[i - 1].frequency)
+              maxJump = Math.max(maxJump, jump)
+              totalJump += jump
+              jumpCount++
+            }
+
+            const avgJump = jumpCount > 0 ? totalJump / jumpCount : 0
+
+            // Penalize large frequency jumps (> 80 cents between consecutive readings)
+            // This detects tonguing/jumping vs smooth gliding
+            const jumpCents = 1200 * Math.log2(1 + maxJump / expected)
+            if (jumpCents > 80) {
+              const glidePenalty = Math.min(25, (jumpCents - 80) / 2)
+              accuracy = Math.max(0, accuracy - glidePenalty)
+            }
+
+            // Additional penalty if average jump is high (indicates rough playing)
+            const avgJumpCents = 1200 * Math.log2(1 + avgJump / expected)
+            if (avgJumpCents > 30) {
+              const roughnessPenalty = Math.min(15, (avgJumpCents - 30) / 3)
+              accuracy = Math.max(0, accuracy - roughnessPenalty)
+            }
+          }
+
+          // Apply rhythm timing penalty for rhythm mode
+          if (evaluationMode === 'rhythm' && targetBpm && noteOnsetTimeRef.current > 0) {
+            const secondsPerBeat = 60.0 / targetBpm
+            const timingError = Math.abs(noteOnsetTimeRef.current - expectedBeatTimeRef.current)
+            // Convert timing error to percentage of beat duration
+            const timingErrorPercent = (timingError / secondsPerBeat) * 100
+            // Penalize if note is more than 20% off from expected beat
+            if (timingErrorPercent > 20) {
+              const rhythmPenalty = Math.min(30, (timingErrorPercent - 20) * 1.5)
+              accuracy = Math.max(0, accuracy - rhythmPenalty)
+            }
+          }
 
           noteResultsRef.current.push({
             note: target.note,
             expectedNote: target.note,
             detectedNote: r.note,
             accuracy,
-            durationHeld: Math.max(0.4, holdDuration),
+            durationHeld: Math.max(minHoldDuration || 0.4, holdDuration),
             octave: target.octave,
+            variant: target.variant || 'shuddha',
           })
 
           // Reset confirmation state for the next note
           confirmCountRef.current = 0
           pendingCentsRef.current = []
           firstMatchTimeRef.current = 0
+          glideTransitionHistoryRef.current = []
+          lastMatchedFrequencyRef.current = 0
+          noteOnsetTimeRef.current = 0
 
           const next = currentIndex + 1
           if (next >= targets.length) {
@@ -210,9 +333,9 @@ export function useTargetPractice({
           setStruggling(true)
         }
       }
-    }, 400)
+    }, pollInterval)
     return () => clearInterval(interval)
-  }, [phase, target, currentIndex, targets.length, fluteKey, loop, onComplete])
+  }, [phase, target, currentIndex, targets.length, fluteKey, loop, onComplete, toleranceCents, confirmPolls, pollInterval, minHoldDuration, evaluationMode, stabilityThreshold, targetBpm])
 
   const buildSession = (
     mode: PracticeSession['mode'],

@@ -34,42 +34,42 @@ export function getScaleTargets(
   switch (type) {
     case 'ascending':
       return [
-        { note: 'SA', octave: baseOctave },
-        { note: 'RE', octave: baseOctave },
-        { note: 'GA', octave: baseOctave },
-        { note: 'MA', octave: baseOctave },
-        { note: 'PA', octave: baseOctave },
-        { note: 'DHA', octave: baseOctave },
-        { note: 'NI', octave: baseOctave },
-        { note: 'SA', octave: upper },
+        { note: 'SA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'RE', octave: baseOctave, variant: 'shuddha' },
+        { note: 'GA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'MA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'PA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'DHA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'NI', octave: baseOctave, variant: 'shuddha' },
+        { note: 'SA', octave: upper, variant: 'shuddha' },
       ]
     case 'descending':
       return [
-        { note: 'SA', octave: upper },
-        { note: 'NI', octave: baseOctave },
-        { note: 'DHA', octave: baseOctave },
-        { note: 'PA', octave: baseOctave },
-        { note: 'MA', octave: baseOctave },
-        { note: 'GA', octave: baseOctave },
-        { note: 'RE', octave: baseOctave },
-        { note: 'SA', octave: baseOctave },
+        { note: 'SA', octave: upper, variant: 'shuddha' },
+        { note: 'NI', octave: baseOctave, variant: 'shuddha' },
+        { note: 'DHA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'PA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'MA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'GA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'RE', octave: baseOctave, variant: 'shuddha' },
+        { note: 'SA', octave: baseOctave, variant: 'shuddha' },
       ]
     case 'single':
       return [
-        { note: 'SA', octave: baseOctave },
-        { note: 'RE', octave: baseOctave },
-        { note: 'GA', octave: baseOctave },
-        { note: 'MA', octave: baseOctave },
-        { note: 'PA', octave: baseOctave },
-        { note: 'DHA', octave: baseOctave },
-        { note: 'NI', octave: baseOctave },
-        { note: 'SA', octave: upper },
+        { note: 'SA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'RE', octave: baseOctave, variant: 'shuddha' },
+        { note: 'GA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'MA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'PA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'DHA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'NI', octave: baseOctave, variant: 'shuddha' },
+        { note: 'SA', octave: upper, variant: 'shuddha' },
       ]
   }
 }
 
 export function randomNoteTarget(baseOctave = 4): NoteTarget {
-  return { note: randomNote(), octave: baseOctave }
+  return { note: randomNote(), octave: baseOctave, variant: 'shuddha' }
 }
 
 export function randomNoteTargets(count: number, baseOctave = 4): NoteTarget[] {

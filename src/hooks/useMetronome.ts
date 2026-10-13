@@ -17,6 +17,8 @@ export interface UseMetronomeReturn {
   start: () => void
   stop: () => void
   toggle: () => void
+  /** Get the timestamp of the most recent beat (for rhythm evaluation) */
+  getLastBeatTime: () => number
 }
 
 const MIN_BPM = 30
@@ -40,6 +42,7 @@ export function useMetronome(): UseMetronomeReturn {
   const bpmRef = useRef(bpm)
   const beatsPerMeasureRef = useRef(beatsPerMeasure)
   const isRunningRef = useRef(false)
+  const lastBeatTimeRef = useRef(0)
 
   // Keep refs in sync
   bpmRef.current = bpm
@@ -83,6 +86,9 @@ export function useMetronome(): UseMetronomeReturn {
     while (nextNoteTimeRef.current < ctx.currentTime + scheduleAhead) {
       const isAccent = currentBeatRef.current === 0
       scheduleClick(nextNoteTimeRef.current, isAccent)
+
+      // Record the time of this beat for rhythm evaluation
+      lastBeatTimeRef.current = nextNoteTimeRef.current
 
       // Update visual beat (debounced to next frame for UI)
       const beatForUpdate = currentBeatRef.current
@@ -142,6 +148,10 @@ export function useMetronome(): UseMetronomeReturn {
     setBpmState(Math.max(MIN_BPM, Math.min(MAX_BPM, Math.round(newBpm))))
   }, [])
 
+  const getLastBeatTime = useCallback(() => {
+    return lastBeatTimeRef.current
+  }, [])
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -166,6 +176,7 @@ export function useMetronome(): UseMetronomeReturn {
     start,
     stop,
     toggle,
+    getLastBeatTime,
   }
 }
 

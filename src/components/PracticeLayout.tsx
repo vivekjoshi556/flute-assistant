@@ -33,6 +33,7 @@ interface PracticeLayoutProps {
   showHints?: boolean
   hintsAvailable?: boolean
   showMetronome?: boolean
+  targetBpm?: number
   statusLabel?: string
   children?: ReactNode
   footer?: ReactNode
@@ -54,6 +55,7 @@ export function PracticeLayout({
   showHints = false,
   hintsAvailable = true,
   showMetronome = false,
+  targetBpm,
   statusLabel = 'Play',
   children,
   footer,
@@ -154,7 +156,7 @@ export function PracticeLayout({
 
       {showMetronome && (
         <div className="mx-auto w-full max-w-lg">
-          <MetronomeControls />
+          <MetronomeControls targetBpm={targetBpm} />
         </div>
       )}
 

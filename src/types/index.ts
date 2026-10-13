@@ -31,6 +31,8 @@ export interface NoteResult {
   durationHeld: number
   /** MIDI octave of the expected note (e.g. 5 for middle octave, 6 for upper). */
   octave?: number
+  /** Swar variant (komal, teevra, shuddha) for detailed tracking */
+  variant?: 'shuddha' | 'komal' | 'teevra'
 }
 
 export interface PracticeSession {

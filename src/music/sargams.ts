@@ -14,14 +14,14 @@ export interface Sargam {
 function ascendingScale(baseOctave: number): NoteTarget[] {
   const upper = baseOctave + 1
   return [
-    { note: 'SA', octave: baseOctave },
-    { note: 'RE', octave: baseOctave },
-    { note: 'GA', octave: baseOctave },
-    { note: 'MA', octave: baseOctave },
-    { note: 'PA', octave: baseOctave },
-    { note: 'DHA', octave: baseOctave },
-    { note: 'NI', octave: baseOctave },
-    { note: 'SA', octave: upper },
+    { note: 'SA', octave: baseOctave, variant: 'shuddha' },
+    { note: 'RE', octave: baseOctave, variant: 'shuddha' },
+    { note: 'GA', octave: baseOctave, variant: 'shuddha' },
+    { note: 'MA', octave: baseOctave, variant: 'shuddha' },
+    { note: 'PA', octave: baseOctave, variant: 'shuddha' },
+    { note: 'DHA', octave: baseOctave, variant: 'shuddha' },
+    { note: 'NI', octave: baseOctave, variant: 'shuddha' },
+    { note: 'SA', octave: upper, variant: 'shuddha' },
   ]
 }
 
@@ -39,9 +39,9 @@ function buildAlankar(baseOctave: number): NoteTarget[] {
   const notes: NoteTarget[] = []
   for (const [a, b] of pairs) {
     const bOctave = b === 'SA' && a === 'NI' ? upper : baseOctave
-    notes.push({ note: a, octave: baseOctave })
-    notes.push({ note: b, octave: bOctave })
-    notes.push({ note: a, octave: baseOctave })
+    notes.push({ note: a, octave: baseOctave, variant: 'shuddha' })
+    notes.push({ note: b, octave: bOctave, variant: 'shuddha' })
+    notes.push({ note: a, octave: baseOctave, variant: 'shuddha' })
   }
   return notes
 }
@@ -56,11 +56,11 @@ export function getSargamsForOctave(baseOctave: number): Sargam[] {
       description: 'First five notes going up — the foundation of every raga.',
       difficulty: 'beginner',
       notes: [
-        { note: 'SA', octave: baseOctave },
-        { note: 'RE', octave: baseOctave },
-        { note: 'GA', octave: baseOctave },
-        { note: 'MA', octave: baseOctave },
-        { note: 'PA', octave: baseOctave },
+        { note: 'SA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'RE', octave: baseOctave, variant: 'shuddha' },
+        { note: 'GA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'MA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'PA', octave: baseOctave, variant: 'shuddha' },
       ],
     },
     {
@@ -69,11 +69,11 @@ export function getSargamsForOctave(baseOctave: number): Sargam[] {
       description: 'Come back down to Sa — trains note memory in reverse.',
       difficulty: 'beginner',
       notes: [
-        { note: 'PA', octave: baseOctave },
-        { note: 'MA', octave: baseOctave },
-        { note: 'GA', octave: baseOctave },
-        { note: 'RE', octave: baseOctave },
-        { note: 'SA', octave: baseOctave },
+        { note: 'PA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'MA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'GA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'RE', octave: baseOctave, variant: 'shuddha' },
+        { note: 'SA', octave: baseOctave, variant: 'shuddha' },
       ],
     },
     {
@@ -89,14 +89,14 @@ export function getSargamsForOctave(baseOctave: number): Sargam[] {
       description: 'Complete descending sargam — upper Sa back to Sa.',
       difficulty: 'beginner',
       notes: [
-        { note: 'SA', octave: upper },
-        { note: 'NI', octave: baseOctave },
-        { note: 'DHA', octave: baseOctave },
-        { note: 'PA', octave: baseOctave },
-        { note: 'MA', octave: baseOctave },
-        { note: 'GA', octave: baseOctave },
-        { note: 'RE', octave: baseOctave },
-        { note: 'SA', octave: baseOctave },
+        { note: 'SA', octave: upper, variant: 'shuddha' },
+        { note: 'NI', octave: baseOctave, variant: 'shuddha' },
+        { note: 'DHA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'PA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'MA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'GA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'RE', octave: baseOctave, variant: 'shuddha' },
+        { note: 'SA', octave: baseOctave, variant: 'shuddha' },
       ],
     },
     {
@@ -105,11 +105,11 @@ export function getSargamsForOctave(baseOctave: number): Sargam[] {
       description: 'Sa–Ga–Pa–Ni–Sa — jumps train interval recognition.',
       difficulty: 'intermediate',
       notes: [
-        { note: 'SA', octave: baseOctave },
-        { note: 'GA', octave: baseOctave },
-        { note: 'PA', octave: baseOctave },
-        { note: 'NI', octave: baseOctave },
-        { note: 'SA', octave: upper },
+        { note: 'SA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'GA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'PA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'NI', octave: baseOctave, variant: 'shuddha' },
+        { note: 'SA', octave: upper, variant: 'shuddha' },
       ],
     },
     {
@@ -125,17 +125,17 @@ export function getSargamsForOctave(baseOctave: number): Sargam[] {
       description: 'Up two, down one — builds agility between registers.',
       difficulty: 'intermediate',
       notes: [
-        { note: 'SA', octave: baseOctave },
-        { note: 'RE', octave: baseOctave },
-        { note: 'SA', octave: baseOctave },
-        { note: 'RE', octave: baseOctave },
-        { note: 'GA', octave: baseOctave },
-        { note: 'RE', octave: baseOctave },
-        { note: 'GA', octave: baseOctave },
-        { note: 'MA', octave: baseOctave },
-        { note: 'GA', octave: baseOctave },
-        { note: 'MA', octave: baseOctave },
-        { note: 'PA', octave: baseOctave },
+        { note: 'SA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'RE', octave: baseOctave, variant: 'shuddha' },
+        { note: 'SA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'RE', octave: baseOctave, variant: 'shuddha' },
+        { note: 'GA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'RE', octave: baseOctave, variant: 'shuddha' },
+        { note: 'GA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'MA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'GA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'MA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'PA', octave: baseOctave, variant: 'shuddha' },
       ],
     },
     {
@@ -145,17 +145,17 @@ export function getSargamsForOctave(baseOctave: number): Sargam[] {
       difficulty: 'advanced',
       notes: [
         ...ascendingScale(baseOctave),
-        { note: 'NI', octave: baseOctave },
-        { note: 'DHA', octave: baseOctave },
-        { note: 'PA', octave: baseOctave },
-        { note: 'MA', octave: baseOctave },
-        { note: 'GA', octave: baseOctave },
-        { note: 'RE', octave: baseOctave },
-        { note: 'SA', octave: baseOctave },
-        { note: 'RE', octave: baseOctave },
-        { note: 'GA', octave: baseOctave },
-        { note: 'RE', octave: baseOctave },
-        { note: 'SA', octave: baseOctave },
+        { note: 'NI', octave: baseOctave, variant: 'shuddha' },
+        { note: 'DHA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'PA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'MA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'GA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'RE', octave: baseOctave, variant: 'shuddha' },
+        { note: 'SA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'RE', octave: baseOctave, variant: 'shuddha' },
+        { note: 'GA', octave: baseOctave, variant: 'shuddha' },
+        { note: 'RE', octave: baseOctave, variant: 'shuddha' },
+        { note: 'SA', octave: baseOctave, variant: 'shuddha' },
       ],
     },
   ]
@@ -173,14 +173,14 @@ export function getAscendingLoop(baseOctave: number): NoteTarget[] {
 export function getDescendingLoop(baseOctave: number): NoteTarget[] {
   const upper = baseOctave + 1
   return [
-    { note: 'SA', octave: upper },
-    { note: 'NI', octave: baseOctave },
-    { note: 'DHA', octave: baseOctave },
-    { note: 'PA', octave: baseOctave },
-    { note: 'MA', octave: baseOctave },
-    { note: 'GA', octave: baseOctave },
-    { note: 'RE', octave: baseOctave },
-    { note: 'SA', octave: baseOctave },
+    { note: 'SA', octave: upper, variant: 'shuddha' },
+    { note: 'NI', octave: baseOctave, variant: 'shuddha' },
+    { note: 'DHA', octave: baseOctave, variant: 'shuddha' },
+    { note: 'PA', octave: baseOctave, variant: 'shuddha' },
+    { note: 'MA', octave: baseOctave, variant: 'shuddha' },
+    { note: 'GA', octave: baseOctave, variant: 'shuddha' },
+    { note: 'RE', octave: baseOctave, variant: 'shuddha' },
+    { note: 'SA', octave: baseOctave, variant: 'shuddha' },
   ]
 }
 
@@ -194,7 +194,7 @@ const ALANKAR_PATTERNS: ((baseOctave: number) => NoteTarget[])[] = [
     for (let i = 0; i <= scale.length - 3; i++) {
       for (let j = 0; j < 3; j++) {
         const idx = i + j
-        notes.push({ note: scale[idx], octave: idx === 7 ? o + 1 : o })
+        notes.push({ note: scale[idx], octave: idx === 7 ? o + 1 : o, variant: 'shuddha' })
       }
     }
     return notes
@@ -206,10 +206,10 @@ const ALANKAR_PATTERNS: ((baseOctave: number) => NoteTarget[])[] = [
     for (let i = 0; i <= scale.length - 3; i++) {
       for (let j = 0; j < 3; j++) {
         const idx = i + j
-        notes.push({ note: scale[idx], octave: idx === 7 ? o + 1 : o })
+        notes.push({ note: scale[idx], octave: idx === 7 ? o + 1 : o, variant: 'shuddha' })
       }
       const backIdx = i + 1
-      notes.push({ note: scale[backIdx], octave: backIdx === 7 ? o + 1 : o })
+      notes.push({ note: scale[backIdx], octave: backIdx === 7 ? o + 1 : o, variant: 'shuddha' })
     }
     return notes
   },
@@ -218,9 +218,9 @@ const ALANKAR_PATTERNS: ((baseOctave: number) => NoteTarget[])[] = [
     const scale: IndianNote[] = ['SA', 'RE', 'GA', 'MA', 'PA', 'DHA', 'NI', 'SA']
     const notes: NoteTarget[] = []
     for (let i = 0; i <= scale.length - 2; i++) {
-      notes.push({ note: scale[i], octave: i === 7 ? o + 1 : o })
-      notes.push({ note: scale[i + 1], octave: (i + 1) === 7 ? o + 1 : o })
-      notes.push({ note: scale[i], octave: i === 7 ? o + 1 : o })
+      notes.push({ note: scale[i], octave: i === 7 ? o + 1 : o, variant: 'shuddha' })
+      notes.push({ note: scale[i + 1], octave: (i + 1) === 7 ? o + 1 : o, variant: 'shuddha' })
+      notes.push({ note: scale[i], octave: i === 7 ? o + 1 : o, variant: 'shuddha' })
     }
     return notes
   },

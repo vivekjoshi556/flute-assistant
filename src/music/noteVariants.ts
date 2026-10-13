@@ -8,22 +8,34 @@ export interface ParsedNote {
   variant: SwarVariant
   octaveOffset: number
   label: string
+  /** Whether this is a rest (silence) */
+  isRest: boolean
+  /** Whether this is a grace note (ornament) */
+  isGrace: boolean
 }
 
 const INDIAN_SET = new Set<string>(['SA', 'RE', 'GA', 'MA', 'PA', 'DHA', 'NI'])
 const KOMAL_NOTES = new Set<string>(['RE', 'GA', 'DHA', 'NI'])
 
-/** Parse exercise notation: SA, re (komal), Ma↑ (teevra), MA↑ (upper octave). */
+/** Parse exercise notation: SA, re (komal), Ma↑ (teevra), MA↑ (upper octave), - (rest), (SA) (grace). */
 export function parseExerciseNote(raw: string): ParsedNote {
   const trimmed = raw.trim()
 
+  // Rest (silence)
+  if (trimmed === '-' || trimmed === '_' || trimmed === '—') {
+    return { note: 'SA', variant: 'shuddha', octaveOffset: 0, label: '-', isRest: true, isGrace: false }
+  }
+
+  // Grace note (parenthesized)
+  const isGrace = trimmed.startsWith('(') && trimmed.endsWith(')')
+  let body = isGrace ? trimmed.slice(1, -1) : trimmed
+
   // Teevra Ma — mixed-case Ma with ↑
-  if (/^Ma↑$/.test(trimmed)) {
-    return { note: 'MA', variant: 'teevra', octaveOffset: 0, label: 'Ma↑' }
+  if (/^Ma↑$/.test(body)) {
+    return { note: 'MA', variant: 'teevra', octaveOffset: 0, label: isGrace ? '(Ma↑)' : 'Ma↑', isRest: false, isGrace }
   }
 
   let octaveOffset = 0
-  let body = trimmed
   if (body.endsWith('↑')) {
     octaveOffset += 1
     body = body.slice(0, -1)
@@ -47,7 +59,9 @@ export function parseExerciseNote(raw: string): ParsedNote {
       ? note.charAt(0) + note.slice(1).toLowerCase()
       : `${note}${octaveOffset > 0 ? '↑' : octaveOffset < 0 ? '↓' : ''}`
 
-  return { note, variant, octaveOffset, label: display }
+  const label = isGrace ? `(${display})` : display
+
+  return { note, variant, octaveOffset, label, isRest: false, isGrace }
 }
 
 export function getVariantFrequency(
@@ -86,12 +100,16 @@ export function exerciseNotesToTargets(
   notes: string[],
   baseOctave: number,
 ): import('./register').NoteTarget[] {
-  return notes.map((raw) => {
+  const result: import('./register').NoteTarget[] = []
+  for (const raw of notes) {
     const parsed = parseExerciseNote(raw)
-    return {
+    // Skip rests in target sequence - they're for notation/reference only
+    if (parsed.isRest) continue
+    result.push({
       note: parsed.note,
       octave: baseOctave + parsed.octaveOffset,
       variant: parsed.variant,
-    }
-  })
+    })
+  }
+  return result
 }

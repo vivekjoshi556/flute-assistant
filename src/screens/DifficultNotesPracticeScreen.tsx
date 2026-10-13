@@ -8,7 +8,7 @@ import type { IndianNote, PracticeSession } from '../types'
 import type { NoteTarget } from '../music/register'
 import { useVoiceNavigation } from '../hooks/useVoiceNavigation'
 
-function getDifficultNotes(sessions: PracticeSession[]): { note: IndianNote; accuracy: number; isDefault: boolean }[] {
+function getDifficultNotes(sessions: PracticeSession[]): { note: IndianNote; accuracy: number; isDefault: boolean; variant?: 'shuddha' | 'komal' | 'teevra' }[] {
   // Filter for sessions that have note results
   const validSessions = sessions
     .filter((s) => s.noteResults && s.noteResults.length > 0)
@@ -16,37 +16,40 @@ function getDifficultNotes(sessions: PracticeSession[]): { note: IndianNote; acc
 
   if (validSessions.length === 0) {
     return [
-      { note: 'SA', accuracy: 0, isDefault: true },
-      { note: 'RE', accuracy: 0, isDefault: true },
-      { note: 'GA', accuracy: 0, isDefault: true },
+      { note: 'SA', accuracy: 0, isDefault: true, variant: 'shuddha' },
+      { note: 'RE', accuracy: 0, isDefault: true, variant: 'shuddha' },
+      { note: 'GA', accuracy: 0, isDefault: true, variant: 'shuddha' },
     ]
   }
 
-  const noteStats = {} as Partial<Record<IndianNote, { totalAcc: number; count: number }>>
+  // Use composite key (note + variant) to distinguish komal from shuddha
+  const noteStats = {} as Partial<Record<string, { totalAcc: number; count: number; note: IndianNote; variant?: 'shuddha' | 'komal' | 'teevra' }>>
 
   for (const session of validSessions) {
     for (const res of session.noteResults) {
       const note = res.note
       if (!note) continue
-      let stat = noteStats[note]
+      const variant = res.variant || 'shuddha'
+      const key = `${note}-${variant}`
+      let stat = noteStats[key]
       if (!stat) {
-        stat = { totalAcc: 0, count: 0 }
-        noteStats[note] = stat
+        stat = { totalAcc: 0, count: 0, note, variant }
+        noteStats[key] = stat
       }
       stat.totalAcc += res.accuracy
       stat.count += 1
     }
   }
 
-  const entries = Object.keys(noteStats) as IndianNote[]
-  const resultList = entries.map((note) => {
-    const stat = noteStats[note]!
-    return {
-      note,
-      accuracy: stat.totalAcc / stat.count,
-      isDefault: false,
-    }
-  })
+  const entries = Object.values(noteStats)
+  const resultList = entries
+    .filter((stat): stat is NonNullable<typeof stat> => stat !== undefined)
+    .map((stat) => ({
+    note: stat.note,
+    accuracy: stat.totalAcc / stat.count,
+    isDefault: false,
+    variant: stat.variant,
+  }))
 
   // Sort lowest accuracy first
   resultList.sort((a, b) => a.accuracy - b.accuracy)
@@ -54,11 +57,19 @@ function getDifficultNotes(sessions: PracticeSession[]): { note: IndianNote; acc
   const difficult = resultList.slice(0, 3)
 
   if (difficult.length < 3) {
-    const defaultPool: IndianNote[] = ['SA', 'RE', 'GA', 'MA', 'PA', 'DHA', 'NI']
-    for (const note of defaultPool) {
+    const defaultPool: { note: IndianNote; variant: 'shuddha' | 'komal' | 'teevra' }[] = [
+      { note: 'SA', variant: 'shuddha' },
+      { note: 'RE', variant: 'shuddha' },
+      { note: 'GA', variant: 'shuddha' },
+      { note: 'MA', variant: 'shuddha' },
+      { note: 'PA', variant: 'shuddha' },
+      { note: 'DHA', variant: 'shuddha' },
+      { note: 'NI', variant: 'shuddha' },
+    ]
+    for (const { note, variant } of defaultPool) {
       if (difficult.length >= 3) break
-      if (!difficult.some((d) => d.note === note)) {
-        difficult.push({ note, accuracy: 0, isDefault: true })
+      if (!difficult.some((d) => d.note === note && d.variant === variant)) {
+        difficult.push({ note, accuracy: 0, isDefault: true, variant })
       }
     }
   }
@@ -87,19 +98,19 @@ function posToNoteTarget(pos: number, baseOctave: number): NoteTarget {
   }
 }
 
-function generateSequence(difficultNotes: IndianNote[], baseOctave: number): NoteTarget[] {
+function generateSequence(difficultNotes: { note: IndianNote; variant?: 'shuddha' | 'komal' | 'teevra' }[], baseOctave: number): NoteTarget[] {
   const notes = difficultNotes.slice(0, 3)
   while (notes.length < 3) {
-    notes.push('SA')
+    notes.push({ note: 'SA', variant: 'shuddha' })
   }
 
   // A pattern of 18 notes that tests all transitions and has no consecutive duplicates
   const pattern = [0, 1, 2, 0, 2, 1, 0, 1, 2, 1, 2, 0, 1, 0, 2, 0, 1, 2]
   const rawNotes = pattern.map((idx) => notes[idx])
 
-  // Convert rawNotes to NoteTargets with appropriate octaves
+  // Convert rawNotes to NoteTargets with appropriate octaves and variants
   let saCount = 0
-  const targets: NoteTarget[] = rawNotes.map((note) => {
+  const targets: NoteTarget[] = rawNotes.map(({ note, variant }) => {
     let octave = baseOctave
     if (note === 'SA') {
       if (saCount % 2 === 1) {
@@ -107,7 +118,7 @@ function generateSequence(difficultNotes: IndianNote[], baseOctave: number): Not
       }
       saCount++
     }
-    return { note, octave }
+    return { note, octave, variant: variant || 'shuddha' }
   })
 
   // Smooth the sequence by inserting bridge notes where leaps are > 2
@@ -131,7 +142,9 @@ function generateSequence(difficultNotes: IndianNote[], baseOctave: number): Not
       let tempPos = prevPos
       while (Math.abs(currPos - tempPos) > 2) {
         tempPos += currPos > tempPos ? 2 : -2
-        smoothed.push(posToNoteTarget(tempPos, baseOctave))
+        const bridgeTarget = posToNoteTarget(tempPos, baseOctave)
+        // Bridge notes should use shuddha variant
+        smoothed.push({ ...bridgeTarget, variant: 'shuddha' })
       }
     }
 
@@ -172,8 +185,7 @@ export function DifficultNotesPracticeScreen() {
 
   // 2. Generate target sequence
   const targets = useMemo(() => {
-    const noteNames = difficultList.map((d) => d.note)
-    return generateSequence(noteNames, settings.baseOctave)
+    return generateSequence(difficultList, settings.baseOctave)
   }, [difficultList, settings.baseOctave])
 
   // 3. Setup practice hook
@@ -253,31 +265,38 @@ export function DifficultNotesPracticeScreen() {
               Your 3 Target Notes
             </h2>
             <div className="grid grid-cols-3 gap-4">
-              {difficultList.map(({ note, accuracy, isDefault }) => (
-                <div
-                  key={note}
-                  className="bg-surface-raised border border-border rounded-xl p-4 text-center flex flex-col items-center justify-between shadow-sm group hover:border-accent/40 transition-all"
-                >
-                  <div className="text-2xl font-bold text-accent w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center border border-accent/20 mb-2">
-                    {note}
+              {difficultList.map(({ note, accuracy, isDefault, variant }) => {
+                const displayNote = variant === 'komal'
+                  ? note.charAt(0) + note.slice(1).toLowerCase()
+                  : variant === 'teevra'
+                  ? 'Ma↑'
+                  : note
+                return (
+                  <div
+                    key={`${note}-${variant}`}
+                    className="bg-surface-raised border border-border rounded-xl p-4 text-center flex flex-col items-center justify-between shadow-sm group hover:border-accent/40 transition-all"
+                  >
+                    <div className="text-2xl font-bold text-accent w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center border border-accent/20 mb-2">
+                      {displayNote}
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-text-muted uppercase tracking-wider">Avg Accuracy</p>
+                      <p className="text-base font-bold mt-0.5">
+                        {isDefault ? '—' : `${Math.round(accuracy)}%`}
+                      </p>
+                    </div>
+                    {isDefault ? (
+                      <span className="text-[9px] px-2 py-0.5 bg-surface-overlay text-text-muted rounded-full mt-3 border border-border/50 font-medium">
+                        Default
+                      </span>
+                    ) : (
+                      <span className="text-[9px] px-2 py-0.5 bg-danger/10 text-danger rounded-full mt-3 border border-danger/20 font-semibold uppercase tracking-wider">
+                        Weak Spot
+                      </span>
+                    )}
                   </div>
-                  <div>
-                    <p className="text-[10px] text-text-muted uppercase tracking-wider">Avg Accuracy</p>
-                    <p className="text-base font-bold mt-0.5">
-                      {isDefault ? '—' : `${Math.round(accuracy)}%`}
-                    </p>
-                  </div>
-                  {isDefault ? (
-                    <span className="text-[9px] px-2 py-0.5 bg-surface-overlay text-text-muted rounded-full mt-3 border border-border/50 font-medium">
-                      Default
-                    </span>
-                  ) : (
-                    <span className="text-[9px] px-2 py-0.5 bg-danger/10 text-danger rounded-full mt-3 border border-danger/20 font-semibold uppercase tracking-wider">
-                      Weak Spot
-                    </span>
-                  )}
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
 

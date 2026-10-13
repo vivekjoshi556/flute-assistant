@@ -19,7 +19,7 @@ export interface Alankar {
 const SCALE: IndianNote[] = ['SA', 'RE', 'GA', 'MA', 'PA', 'DHA', 'NI', 'SA']
 
 function noteAt(idx: number, baseOctave: number): NoteTarget {
-  return { note: SCALE[idx], octave: idx >= 7 ? baseOctave + 1 : baseOctave }
+  return { note: SCALE[idx], octave: idx >= 7 ? baseOctave + 1 : baseOctave, variant: 'shuddha' }
 }
 
 /** Build a sliding-window alankar from a permutation pattern (1-indexed). */

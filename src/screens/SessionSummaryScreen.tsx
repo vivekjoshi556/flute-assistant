@@ -350,20 +350,34 @@ const NOTE_SEQUENCE: IndianNote[] = ['SA', 'RE', 'GA', 'MA', 'PA', 'DHA', 'NI']
 /**
  * Build a display key for a note result.
  * Notes with an octave strictly above the first result's octave get a ↑ suffix.
+ * Komal/teevra variants are preserved with lowercase or ↑ modifiers.
  */
-function noteKey(note: IndianNote, octave?: number, baseOctave?: number): string {
-  if (octave !== undefined && baseOctave !== undefined && octave > baseOctave) {
-    return `${note}↑`
+function noteKey(
+  note: IndianNote,
+  octave?: number,
+  baseOctave?: number,
+  variant?: 'shuddha' | 'komal' | 'teevra',
+): string {
+  let base = note
+  if (variant === 'komal') {
+    base = note.charAt(0) + note.slice(1).toLowerCase() as IndianNote
+  } else if (variant === 'teevra') {
+    base = 'Ma↑' as IndianNote
   }
-  return note
+
+  if (octave !== undefined && baseOctave !== undefined && octave > baseOctave) {
+    return `${base}↑`
+  }
+  return base
 }
 
 /**
- * Group note results by note+octave key and return average accuracy per key.
+ * Group note results by note+octave+variant key and return average accuracy per key.
  * Upper-octave notes (octave > base) get a ↑ suffix so they appear separately.
+ * Komal/teevra variants are preserved to show specific technical weaknesses.
  */
 function groupAccuracy(
-  results: { note: IndianNote; accuracy: number; octave?: number }[],
+  results: { note: IndianNote; accuracy: number; octave?: number; variant?: 'shuddha' | 'komal' | 'teevra' }[],
 ): Record<string, number> {
   // Determine the base octave from the lowest octave seen in results (if any have octave info).
   const octaves = results.map((r) => r.octave).filter((o): o is number => o !== undefined)
@@ -371,7 +385,7 @@ function groupAccuracy(
 
   const map: Record<string, number[]> = {}
   for (const r of results) {
-    const key = noteKey(r.note, r.octave, baseOctave)
+    const key = noteKey(r.note, r.octave, baseOctave, r.variant)
     if (!map[key]) map[key] = []
     map[key].push(r.accuracy)
   }
@@ -384,7 +398,8 @@ function groupAccuracy(
 
 /**
  * Return entries sorted either by sargam sequence order or by accuracy (descending).
- * Sequence order: SA RE GA MA PA DHA NI SA↑ RE↑ …
+ * Sequence order: SA RE GA MA PA DHA NI SA↑ re ga dha ni SA↑ RE↑ …
+ * Komal notes (lowercase) appear after their shuddha counterparts.
  */
 function sortNoteEntries(
   entries: [string, number][],
@@ -396,18 +411,28 @@ function sortNoteEntries(
   return [...entries].sort(([a], [b]) => {
     const aUpper = a.endsWith('↑')
     const bUpper = b.endsWith('↑')
-    const aNorm = (aUpper ? a.slice(0, -1) : a) as IndianNote
-    const bNorm = (bUpper ? b.slice(0, -1) : b) as IndianNote
+    const aBase = aUpper ? a.slice(0, -1) : a
+    const bBase = bUpper ? b.slice(0, -1) : b
+
+    // Handle komal (lowercase) vs shuddha (uppercase)
+    const aIsKomal = aBase !== aBase.toUpperCase()
+    const bIsKomal = bBase !== bBase.toUpperCase()
+    const aNorm = aBase.toUpperCase() as IndianNote
+    const bNorm = bBase.toUpperCase() as IndianNote
+
     const aIdx = NOTE_SEQUENCE.indexOf(aNorm)
     const bIdx = NOTE_SEQUENCE.indexOf(bNorm)
+
     if (aIdx !== bIdx) return aIdx - bIdx
-    // Same note name: lower octave first
+
+    // Same note name: shuddha before komal, then lower octave before upper
+    if (aIsKomal !== bIsKomal) return aIsKomal ? 1 : -1
     return Number(aUpper) - Number(bUpper)
   })
 }
 
 function analyzeNotes(
-  results: { note: IndianNote; accuracy: number; octave?: number }[],
+  results: { note: IndianNote; accuracy: number; octave?: number; variant?: 'shuddha' | 'komal' | 'teevra' }[],
 ): { difficult: string[]; stable: string[] } {
   const grouped = groupAccuracy(results)
   const entries = Object.entries(grouped)

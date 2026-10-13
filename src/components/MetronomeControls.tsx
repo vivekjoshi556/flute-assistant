@@ -1,9 +1,20 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useMetronome, BPM_PRESETS } from '../hooks/useMetronome'
 
-export function MetronomeControls() {
+interface MetronomeControlsProps {
+  targetBpm?: number
+}
+
+export function MetronomeControls({ targetBpm }: MetronomeControlsProps) {
   const metronome = useMetronome()
   const [expanded, setExpanded] = useState(false)
+
+  // Auto-set BPM if targetBpm is provided and differs from current
+  useEffect(() => {
+    if (targetBpm && targetBpm !== metronome.bpm) {
+      metronome.setBpm(targetBpm)
+    }
+  }, [targetBpm, metronome])
 
   return (
     <div className="bg-surface-raised border border-border rounded-xl overflow-hidden">

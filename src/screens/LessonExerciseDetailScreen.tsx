@@ -26,6 +26,13 @@ export function LessonExerciseDetailScreen() {
     fluteKey: settings.fluteKey,
     targets,
     enabled: !!exercise,
+    minHoldDuration: exercise?.minHoldDuration,
+    toleranceCents: exercise?.toleranceCents,
+    pollInterval: exercise?.pollInterval,
+    confirmPolls: exercise?.confirmPolls,
+    evaluationMode: exercise?.evaluationMode,
+    stabilityThreshold: exercise?.stabilityThreshold,
+    targetBpm: exercise?.targetBpm,
   })
 
   useEffect(() => {
@@ -79,6 +86,8 @@ export function LessonExerciseDetailScreen() {
             baseOctave={settings.baseOctave}
             showHints={practice.showHints}
             hintsAvailable
+            showMetronome={exercise?.evaluationMode === 'rhythm'}
+            targetBpm={exercise?.targetBpm}
             statusLabel="Play"
             footer={
               <div className="flex justify-center pt-2">
